@@ -1,0 +1,40 @@
+/**
+ * This file is the configuration file for shadcn/ui components.
+ * It defines how shadcn/ui components are integrated and configured within the project,
+ * including styling, aliases, and other preferences.
+ */
+{
+  // Specifies the schema for validation and autocompletion in JSON editors.
+  "$schema": "https://ui.shadcn.com/schema.json",
+  // Defines the style preset for shadcn/ui components. "new-york" is a common preset.
+  "style": "new-york",
+  // Indicates whether React Server Components (RSC) are enabled.
+  "rsc": true,
+  // Indicates whether TypeScript (TSX) is used for components.
+  "tsx": true,
+  // Tailwind CSS specific configuration for shadcn/ui.
+  "tailwind": {
+    // Path to the Tailwind CSS configuration file. Empty string means default or inferred.
+    "config": "",
+    // Path to the global CSS file where Tailwind directives are imported.
+    "css": "app/globals.css",
+    // Base color used for generating color palettes.
+    "baseColor": "neutral",
+    // Enables CSS variables for colors, allowing dynamic theme changes.
+    "cssVariables": true,
+    // Prefix for Tailwind classes to avoid conflicts. Empty string means no prefix.
+    "prefix": ""
+  },
+  // Specifies the icon library used with shadcn/ui components.
+  "iconLibrary": "lucide",
+  // Defines path aliases used for importing modules.
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  },
+  // Placeholder for component registries, if any.
+  "registries": {}
+}

@@ -5,6 +5,7 @@ This document details the database architecture for ShareHive, focusing on the P
 **[◄ Back to Overview](./overview.md)**
 
 ### Table of Contents
+
 1. [Database Technology Stack](#1-database-technology-stack)
 2. [Prisma Schema Diagram](#2-prisma-schema-diagram)
 3. [Model and Relationship Details](#3-model-and-relationship-details)
@@ -15,11 +16,11 @@ This document details the database architecture for ShareHive, focusing on the P
 
 ### 1. Database Technology Stack
 
-| Component | Technology | Purpose |
-| :--- | :--- | :--- |
-| **Database** | PostgreSQL | A robust, open-source relational database for storing all application data. |
-| **Hosting** | Neon DB | A serverless PostgreSQL provider that offers autoscaling and connection pooling, ideal for our Vercel-hosted application. |
-| **ORM** | Prisma | A next-generation ORM that provides a type-safe database client and a declarative way to manage our schema and migrations. |
+| Component    | Technology | Purpose                                                                                                                    |
+| :----------- | :--------- | :------------------------------------------------------------------------------------------------------------------------- |
+| **Database** | PostgreSQL | A robust, open-source relational database for storing all application data.                                                |
+| **Hosting**  | Neon DB    | A serverless PostgreSQL provider that offers autoscaling and connection pooling, ideal for our Vercel-hosted application.  |
+| **ORM**      | Prisma     | A next-generation ORM that provides a type-safe database client and a declarative way to manage our schema and migrations. |
 
 ### 2. Prisma Schema Diagram
 
@@ -66,6 +67,7 @@ erDiagram
 The schema is defined in `prisma/schema.prisma`.
 
 #### `User` Model
+
 - **Purpose**: Stores application-specific data for a user, linked to their Clerk identity.
 - **Key Fields**:
   - `id`: The internal primary key for our application (`cuid`).
@@ -75,6 +77,7 @@ The schema is defined in `prisma/schema.prisma`.
   - **One-to-Many with `Comment`**: A user can write many comments.
 
 #### `Course` Model
+
 - **Purpose**: Represents a course created within the application.
 - **Key Fields**:
   - `authorId`: A foreign key that establishes a mandatory relationship with the `User` who created it.
@@ -84,6 +87,7 @@ The schema is defined in `prisma/schema.prisma`.
   - **One-to-Many with `Comment`**: A course can have many comments.
 
 #### `Comment` Model
+
 - **Purpose**: Represents a comment made by a user on a specific course.
 - **Key Fields**:
   - `authorId`: Foreign key linking to the `User` who wrote the comment.
@@ -91,7 +95,8 @@ The schema is defined in `prisma/schema.prisma`.
   - `onDelete: Cascade` (Prisma): Ensures comments are deleted if their parent user or course is deleted.
 
 #### Many-to-Many Relationship: `User` and `Course` (Follows)
-- **Implementation**: Prisma manages this relationship *implicitly*. By defining a `User[]` field on `Course` and a `Course[]` field on `User`, Prisma automatically creates and manages a hidden join table (named `_CourseFollows` by convention) to manage this relationship.
+
+- **Implementation**: Prisma manages this relationship _implicitly_. By defining a `User[]` field on `Course` and a `Course[]` field on `User`, Prisma automatically creates and manages a hidden join table (named `_CourseFollows` by convention) to manage this relationship.
 - **Purpose**: Allows a user to "follow" multiple courses, and a course to be "followed by" multiple users.
 
 ### 4. Connection Management (Prisma Client)
@@ -104,13 +109,13 @@ graph TD
     subgraph "Serverless Function (e.g., API Route)"
         A[Request Starts] --> B{Imports `prisma` from `lib/prisma.ts`}
     end
-    
+
     subgraph "lib/prisma.ts"
         C{"Is `global.prisma` defined?"}
         D["global.prisma = new PrismaClient()<br/>Create new instance"]
         E["Use existing `global.prisma` instance"]
     end
-    
+
     subgraph "Neon DB"
         F[Connection Pool]
     end
@@ -121,6 +126,7 @@ graph TD
     D --> F
     E --> F
 ```
+
 This pattern ensures that across multiple hot-reloads in development or multiple invocations within the same serverless container, we reuse the same database connection pool.
 
 ### 5. Migrations Workflow
@@ -128,6 +134,7 @@ This pattern ensures that across multiple hot-reloads in development or multiple
 We use `prisma migrate` to evolve the database schema safely.
 
 - **Development**:
+
   1. Modify `schema.prisma`.
   2. Run `npx prisma migrate dev --name <migration-description>`.
   3. This generates a new SQL file in `prisma/migrations/` and applies it to the local database.
@@ -138,4 +145,5 @@ We use `prisma migrate` to evolve the database schema safely.
   3. It applies any pending migration files to the production Neon DB in a non-interactive, safe manner.
 
 ---
+
 **[◄ Back to Overview](./overview.md)**

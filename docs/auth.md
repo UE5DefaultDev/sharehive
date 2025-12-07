@@ -5,6 +5,7 @@ This document provides a detailed analysis of the user authentication and manage
 **[◄ Back to Overview](./overview.md)**
 
 ### Table of Contents
+
 1. [Authentication Model](#1-authentication-model)
 2. [Session Management and JWT Flow](#2-session-management-and-jwt-flow)
 3. [Route Protection with Middleware](#3-route-protection-with-middleware)
@@ -40,10 +41,10 @@ graph TD
     D -- "Syncs User Via Webhook To" --> C
 ```
 
-| Component | Responsibility |
-| :--- | :--- |
-| **Clerk UI** | Renders login/signup forms and manages user interactions. |
-| **Clerk Service** | Creates users, validates credentials, issues JSON Web Tokens (JWTs), and manages sessions. |
+| Component             | Responsibility                                                                                          |
+| :-------------------- | :------------------------------------------------------------------------------------------------------ |
+| **Clerk UI**          | Renders login/signup forms and manages user interactions.                                               |
+| **Clerk Service**     | Creates users, validates credentials, issues JSON Web Tokens (JWTs), and manages sessions.              |
 | **ShareHive Backend** | Verifies JWTs from incoming requests and synchronizes user profiles into its own database via webhooks. |
 
 ### 2. Session Management and JWT Flow
@@ -58,13 +59,13 @@ sequenceDiagram
 
     Client->>Clerk: User logs in
     Clerk-->>Client: Sets `__session` cookie (HttpOnly) containing JWT
-    
+
     Client->>Backend: Makes a request (e.g., page navigation or API call)
     note right of Client: Browser automatically includes the<br/>`__session` cookie in the request headers.
 
     Backend->>Clerk: Middleware/helper uses token to fetch current user's state
     Clerk-->>Backend: Returns session and user details (e.g., userId)
-    
+
     alt Session is Valid
         Backend-->>Client: Proceeds with request, returns requested data/page
     else Session is Invalid
@@ -89,6 +90,7 @@ graph TD
     F -- "Yes" --> E;
     F -- "No" --> G[Redirect to Sign-In Page];
 ```
+
 This server-side protection ensures that unauthorized users can never access sensitive data or pages, even if they attempt to bypass client-side routing.
 
 ### 4. User Data Synchronization
@@ -105,7 +107,7 @@ sequenceDiagram
     participant DB [Neon DB (Prisma)]
 
     Clerk->>Clerk: A new user signs up
-    
+
     Clerk->>WebhookAPI: Sends `user.created` event (JSON payload)
     note right of Clerk: Payload includes `id`, `email_addresses`, etc.
 
@@ -118,4 +120,5 @@ sequenceDiagram
 This automated process ensures that for every user in Clerk, there is a corresponding entry in our application's database that we can use to establish relationships (e.g., which user created which course).
 
 ---
+
 **[◄ Back to Overview](./overview.md)**

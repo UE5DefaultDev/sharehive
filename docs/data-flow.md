@@ -5,6 +5,7 @@ This document provides a detailed, step-by-step visualization of how data moves 
 **[◄ Back to Overview](./overview.md)**
 
 ### Table of Contents
+
 1. [Data Flow: New User Registration](#1-data-flow-new-user-registration)
 2. [Data Flow: User Creates a New Course](#2-data-flow-user-creates-a-new-course)
 3. [Data Flow: User Uploads a Course Image](#3-data-flow-user-uploads-a-course-image)
@@ -28,7 +29,7 @@ sequenceDiagram
     ClientBrowser->>Clerk: Initiates sign-up flow (displays Clerk's form)
     User->>Clerk: Submits registration form (e.g., email & password)
     Clerk->>Clerk: Creates user record in its own system
-    
+
     par
         Clerk-->>ClientBrowser: Returns session JWT (in cookie)
         ClientBrowser-->>User: Logs user in and redirects
@@ -40,6 +41,7 @@ sequenceDiagram
         BackendWebhook-->>Clerk: Returns `200 OK`
     end
 ```
+
 - **Initiator**: User action.
 - **Data Format**: The webhook from Clerk to our backend is a `JSON` payload.
 - **Storage**: Clerk stores the primary user identity. Our **Neon DB** stores a corresponding application-level user record, linked by the `clerkId`.
@@ -76,6 +78,7 @@ sequenceDiagram
         ClientCreateCourse->>User: Displays "Error" notification
     end
 ```
+
 - **Initiator**: User form submission.
 - **Data Format**: `FormData` is passed from the client to the Server Action.
 - **Storage**: The new course data is stored as a new row in the `Course` table in our **Neon DB**.
@@ -111,7 +114,7 @@ sequenceDiagram
     else User is Not Authenticated
         BackendUploadThing-->>ClientImageUpload: Return 403 Forbidden error
     end
-    
+
     %% Step 4: Client uploads the file directly to S3
     ClientImageUpload->>S3CloudStorage: PUT request with file binary to the presigned URL
     note over ClientImageUpload, S3CloudStorage: Our server is not involved in this transfer.
@@ -119,12 +122,12 @@ sequenceDiagram
     %% Step 5: S3 confirms, and UploadThing triggers the completion callback
     S3CloudStorage-->>UploadThing: Confirms successful upload
     UploadThing->>BackendUploadThing: POST request (webhook) to `onUploadComplete` handler
-    
+
     %% Step 6: Backend saves the file URL to the database
     BackendUploadThing->>DB: `prisma.course.update({ data: { image: file.url } })`
     DB-->>BackendUploadThing: Confirms database update
     BackendUploadThing-->>UploadThing: Returns `200 OK`
-    
+
     %% Step 7: Client is notified of completion
     ClientImageUpload->>User: Display "Upload Complete" notification
 ```
@@ -143,7 +146,7 @@ graph TD
         B["Executes Server Component for the page"]
         C["`prisma.course.findUnique({ where: { id: 'abc' } })`"]
     end
-    
+
     subgraph "Data Layer"
         D[Neon DB]
     end
@@ -155,9 +158,11 @@ graph TD
     C -- "5. Data is available to component" --> B
     B -- "6. Renders HTML with data" --> A
 ```
+
 - **Initiator**: User navigation.
 - **Data Flow**: This is the most direct flow. The request hits the server, the component runs, fetches data directly from the database, renders HTML, and returns it. There is no client-side JavaScript involved in the data fetching itself.
 - **Storage**: Data is read from the **Neon DB**.
 
 ---
+
 **[◄ Back to Overview](./overview.md)**

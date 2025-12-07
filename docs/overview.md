@@ -49,6 +49,3 @@ This overview serves as the central hub. Please use the links below to navigate 
 - **[8. Deployment & CI/CD](./deployment.md)**
 
   - _The complete workflow for building, testing, and deploying the application to production._
-
-- **[9. Contribution Guidelines](./contributing.md)**
-  - _Standards and processes for contributing to the development of the project._

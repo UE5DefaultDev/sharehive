@@ -5,6 +5,7 @@ This document outlines the recommended process for deploying the ShareHive appli
 **[◄ Back to Overview](./overview.md)**
 
 ### Table of Contents
+
 1. [Deployment Platform: Vercel](#1-deployment-platform-vercel)
 2. [CI/CD Pipeline Diagram](#2-cicd-pipeline-diagram)
 3. [Deployment Steps](#3-deployment-steps)
@@ -29,19 +30,19 @@ sequenceDiagram
     participant DB [Neon DB]
 
     Dev->>GitHub: `git push` to `main` branch
-    
+
     GitHub->>Vercel: Triggers deployment webhook
-    
+
     Vercel->>Vercel: 1. Starts new build environment
     Vercel->>Vercel: 2. Clones the repository
     Vercel->>Vercel: 3. Installs dependencies (`npm install`)
-    
+
     note over Vercel, DB: The `build` script in package.json is executed.
     Vercel->>DB: 4. Runs `prisma migrate deploy`
     DB-->>Vercel: Confirms migrations are applied
-    
+
     Vercel->>Vercel: 5. Builds the Next.js application (`next build`)
-    
+
     alt Build is Successful
         Vercel->>Vercel: 6. Deploys new version to its Edge Network
         Vercel->>Vercel: 7. Assigns the production domain to the new deployment
@@ -86,11 +87,13 @@ Handling database migrations is a critical part of the deployment process.
 
 - **Command**: `prisma migrate deploy`
 - **Why this command?**: It is specifically designed for production environments. It is non-interactive and will only apply existing migration files from the `prisma/migrations` directory. It will **never** attempt to create new migrations or alter the database in an unexpected way.
-- **Execution**: By placing this command in the `build` script, we guarantee that the database schema is updated to match the application code's expectations *before* the new code goes live.
+- **Execution**: By placing this command in the `build` script, we guarantee that the database schema is updated to match the application code's expectations _before_ the new code goes live.
 
 #### Rollback Strategy
+
 - **Application Code**: Vercel makes application rollbacks easy. Through the dashboard, you can instantly re-promote a previous, immutable deployment to the production domain.
 - **Database Migrations**: **Database migrations are not automatically rolled back.** If a faulty migration is deployed, it must be addressed with a new migration that either reverts the changes or fixes the issue. This is why it's critical to test schema changes thoroughly in a staging environment before deploying to production.
 
 ---
+
 **[◄ Back to Overview](./overview.md)**

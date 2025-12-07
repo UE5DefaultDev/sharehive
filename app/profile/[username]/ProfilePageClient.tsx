@@ -178,7 +178,14 @@ function ProfilePageClient({
               <FileTextIcon className="size-4" />
               Courses
             </TabsTrigger>
-
+            <TabsTrigger
+              value="following"
+              className="flex items-center gap-2 rounded-none data-[state=active]:border-b-2 data-[state=active]:border-primary
+               data-[state=active]:bg-transparent px-6 font-semibold"
+            >
+              <HeartIcon className="size-4" />
+              Following
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="courses" className="mt-6">
@@ -194,6 +201,23 @@ function ProfilePageClient({
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   No courses yet
+                </div>
+              )}
+            </div>
+          </TabsContent>
+          <TabsContent value="following" className="mt-6">
+            <div className="space-y-6">
+              {followedCourses.length > 0 ? (
+                followedCourses.map((course) => (
+                  <CourseCard
+                    key={course.id}
+                    course={course}
+                    dbUserId={user.id}
+                  />
+                ))
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  Not following any courses yet
                 </div>
               )}
             </div>

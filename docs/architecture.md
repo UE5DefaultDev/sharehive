@@ -5,6 +5,7 @@ This document provides a detailed overview of the ShareHive system architecture,
 **[◄ Back to Overview](./overview.md)**
 
 ### Table of Contents
+
 1. [High-Level System Diagram](#1-high-level-system-diagram)
 2. [Technology and Service Roles](#2-technology-and-service-roles)
 3. [Project File Structure](#3-project-file-structure)
@@ -25,7 +26,7 @@ graph TD
         B[Next.js Frontend]
         C[Next.js Backend]
     end
-    
+
     subgraph "Data & Services Layer"
         D[Clerk User Management]
         E["Neon DB - PostgreSQL"]
@@ -35,10 +36,10 @@ graph TD
     A -- "HTTPS Requests" --> B
     A -- "Interactive Auth Flow" --> D
     A -- "Direct File Upload (Presigned URL)" --> F
-    
+
     B -- "Renders" --> A
     B -- "Invokes" --> C
-    
+
     C -- "Validates Session (JWT)" --> D
     C -- "CRUD Operations (Prisma ORM)" --> E
     C -- "Authorizes Uploads & Receives Webhooks" --> F
@@ -46,14 +47,14 @@ graph TD
 
 ### 2. Technology and Service Roles
 
-| Component | Technology/Service | Role |
-| :--- | :--- | :--- |
-| **Client** | React / Next.js | Renders the UI, handles user interactions, and initiates requests for authentication and file uploads. |
-| **Frontend** | Next.js / Vercel | Serves static assets, renders Server Components, and provides the client-side JavaScript for Client Components. |
-| **Backend** | Next.js (API Routes / Server Actions) / Vercel | Hosts the application's business logic, processes data, and securely communicates with the data layer. |
-| **Authentication** | Clerk | Manages all aspects of user identity, including sign-up, sign-in, session management (JWT), and user profile data. |
-| **Database** | PostgreSQL (Neon DB) + Prisma ORM | Provides persistent storage for application data (users, courses, etc.). Prisma serves as the type-safe data access layer. |
-| **File Storage** | UploadThing | Manages secure file uploads, storage, and delivery via a CDN. |
+| Component          | Technology/Service                             | Role                                                                                                                       |
+| :----------------- | :--------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------- |
+| **Client**         | React / Next.js                                | Renders the UI, handles user interactions, and initiates requests for authentication and file uploads.                     |
+| **Frontend**       | Next.js / Vercel                               | Serves static assets, renders Server Components, and provides the client-side JavaScript for Client Components.            |
+| **Backend**        | Next.js (API Routes / Server Actions) / Vercel | Hosts the application's business logic, processes data, and securely communicates with the data layer.                     |
+| **Authentication** | Clerk                                          | Manages all aspects of user identity, including sign-up, sign-in, session management (JWT), and user profile data.         |
+| **Database**       | PostgreSQL (Neon DB) + Prisma ORM              | Provides persistent storage for application data (users, courses, etc.). Prisma serves as the type-safe data access layer. |
+| **File Storage**   | UploadThing                                    | Manages secure file uploads, storage, and delivery via a CDN.                                                              |
 
 ### 3. Project File Structure
 
@@ -90,7 +91,7 @@ graph TD
         F1["prisma.ts<br>Prisma Client Instance"]
         F2["utils.ts<br>General Helper Functions"]
     end
-    
+
     subgraph "/prisma"
         H1["schema.prisma<br>Database Models & Relations"]
         H2["/migrations<br>DB Migration History"]
@@ -111,7 +112,7 @@ graph TD
 - **`/app`**: The core of the application, following the Next.js App Router paradigm.
   - **`layout.tsx`**: The root layout component that wraps all pages, typically including the main navigation and theme providers.
   - **`/course/[courseId]`**: A dynamic route where each course is displayed. The `[courseId]` segment is populated at runtime.
-  - **`/api/**`**: Contains all API route handlers. These are server-side endpoints for tasks like handling webhooks or specialized client-side requests.
+  - **`/api/**`\*\*: Contains all API route handlers. These are server-side endpoints for tasks like handling webhooks or specialized client-side requests.
 - **`/components`**: Houses all reusable React components.
   - **`/ui`**: Contains the unstyled, primitive components provided by `shadcn/ui` (e.g., `Button`, `Card`, `Input`).
   - **`CreateCourse.tsx`**: A Client Component containing the form for creating a new course. It uses a Server Action to submit data.
@@ -124,4 +125,5 @@ graph TD
 - **`/public`**: A directory for static assets like images, fonts, and SVGs that are served directly from the root of the site.
 
 ---
+
 **[◄ Back to Overview](./overview.md)**

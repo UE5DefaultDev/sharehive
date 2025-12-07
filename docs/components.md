@@ -5,6 +5,7 @@ This document provides a detailed breakdown of the application's key components,
 **[◄ Back to Overview](./overview.md)**
 
 ### Table of Contents
+
 1. [UI Components](#1-ui-components)
    - [CreateCourse.tsx](#createtcourse-tsx)
    - [CommentSection.tsx](#commentsection-tsx)
@@ -32,7 +33,7 @@ graph TD
         B["UI (JSX)<br/>Renders <form>, <Input>, <Button>"]
         C["Form Submission Handler<br/>Invokes Server Action"]
     end
-    
+
     subgraph "Backend"
        D["course.action.ts<br/>(Server Action)"]
     end
@@ -61,7 +62,7 @@ graph TD
         B["UI (JSX)<br/>Renders comments and a <form>"]
         C["Form Handler<br/>Invokes `addComment` Server Action"]
     end
-    
+
     subgraph "Backend"
         D["comment.action.ts<br/>(Server Action)"]
     end
@@ -128,17 +129,19 @@ sequenceDiagram
 ```mermaid
 graph TD
     A[UploadThing Client] -- "1. Requests upload permission for 'imageUploader' endpoint" --> B{"api/uploadthing/core.ts"}
-    
+
     subgraph B
         C["Middleware<br/>Verifies user is authenticated via Clerk"]
         D["onUploadComplete<br/>Callback function"]
     end
-    
+
     B -- "2. Executes Middleware" --> C
     C -- "3. If successful, authorizes upload" --> A
     A -- "4. Uploads file to UploadThing" --> E[UploadThing Storage]
     E -- "5. On success, UploadThing triggers callback" --> D
     D -- "6. (Optional) Update database with file URL" --> F[Prisma Client]
 ```
+
 ---
+
 **[◄ Back to Overview](./overview.md)**

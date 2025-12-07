@@ -10,9 +10,9 @@ import ProfilePageClient from "./ProfilePageClient";
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ username: string }>;
+  params: { username: string };
 }) {
-  const user = await getProfileByUsername((await params).username);
+  const user = await getProfileByUsername(params.username);
 
   if (!user) return;
 
@@ -25,9 +25,9 @@ export async function generateMetadata({
 async function ProfilePage({
   params,
 }: {
-  params: Promise<{ username:string }>;
+  params: { username: string };
 }) {
-  const user = await getProfileByUsername((await params).username);
+  const user = await getProfileByUsername(params.username);
   if (!user) notFound();
 
   const [courses, followedCourses] = await Promise.all([

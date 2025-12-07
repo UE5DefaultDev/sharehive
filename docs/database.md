@@ -78,7 +78,7 @@ The schema is defined in `prisma/schema.prisma`.
 - **Purpose**: Represents a course created within the application.
 - **Key Fields**:
   - `authorId`: A foreign key that establishes a mandatory relationship with the `User` who created it.
-  - `onDelete: Cascade`: If a `User` is deleted, all of their associated `Course` records are automatically deleted from the database.
+  - `onDelete: Cascade` (Prisma): If a `User` is deleted, all of their associated `Course` records are automatically deleted from the database.
 - **Relations**:
   - **Many-to-One with `User`**: Each course has exactly one author.
   - **One-to-Many with `Comment`**: A course can have many comments.
@@ -88,10 +88,10 @@ The schema is defined in `prisma/schema.prisma`.
 - **Key Fields**:
   - `authorId`: Foreign key linking to the `User` who wrote the comment.
   - `courseId`: Foreign key linking to the `Course` that was commented on.
-  - `onDelete: Cascade`: Ensures comments are deleted if their parent user or course is deleted.
+  - `onDelete: Cascade` (Prisma): Ensures comments are deleted if their parent user or course is deleted.
 
 #### Many-to-Many Relationship: `User` and `Course` (Follows)
-- **Implementation**: Prisma manages this relationship *implicitly*. By defining a `User[]` field on `Course` and a `Course[]` field on `User`, Prisma automatically creates and manages a hidden join table (named `_CourseFollows` by convention).
+- **Implementation**: Prisma manages this relationship *implicitly*. By defining a `User[]` field on `Course` and a `Course[]` field on `User`, Prisma automatically creates and manages a hidden join table (named `_CourseFollows` by convention) to manage this relationship.
 - **Purpose**: Allows a user to "follow" multiple courses, and a course to be "followed by" multiple users.
 
 ### 4. Connection Management (Prisma Client)
@@ -107,7 +107,7 @@ graph TD
     
     subgraph "lib/prisma.ts"
         C{"Is `global.prisma` defined?"}
-        D["`global.prisma = new PrismaClient()`<br>Create new instance"]
+        D["global.prisma = new PrismaClient()<br/>Create new instance"]
         E["Use existing `global.prisma` instance"]
     end
     

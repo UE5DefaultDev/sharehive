@@ -89,7 +89,7 @@ Handling database migrations is a critical part of the deployment process.
 - **Execution**: By placing this command in the `build` script, we guarantee that the database schema is updated to match the application code's expectations *before* the new code goes live.
 
 #### Rollback Strategy
-- **Application Code**: Vercel makes application rollbacks trivial. Through the dashboard, you can instantly re-promote a previous, immutable deployment to the production domain.
+- **Application Code**: Vercel makes application rollbacks easy. Through the dashboard, you can instantly re-promote a previous, immutable deployment to the production domain.
 - **Database Migrations**: **Database migrations are not automatically rolled back.** If a faulty migration is deployed, it must be addressed with a new migration that either reverts the changes or fixes the issue. This is why it's critical to test schema changes thoroughly in a staging environment before deploying to production.
 
 ---

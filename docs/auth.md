@@ -19,17 +19,17 @@ We use a third-party, "delegated" authentication model. Clerk handles all securi
 ```mermaid
 graph TD
     subgraph "User's Browser"
-        A[Clerk UI Components<br>Sign In / Sign Up]
+        A[Clerk UI Components<br/>Sign In / Sign Up]
     end
     subgraph "ShareHive Application (Vercel)"
-        B[Frontend<br>Displays UI]
-        C[Backend<br>Protects API, Accesses User Data]
+        B[Frontend<br/>Displays UI]
+        C[Backend<br/>Protects API, Accesses User Data]
     end
     subgraph "Clerk Service"
         D[User Identity & Session Management]
     end
     subgraph "ShareHive Database (Neon DB)"
-        E[User Table<br>Stores app-specific data]
+        E[User Table<br/>Stores app-specific data]
     end
 
     A -- "Authenticates Against" --> D
@@ -60,7 +60,7 @@ sequenceDiagram
     Clerk-->>Client: Sets `__session` cookie (HttpOnly) containing JWT
     
     Client->>Backend: Makes a request (e.g., page navigation or API call)
-    note right of Client: Browser automatically includes the<br>`__session` cookie in the request headers.
+    note right of Client: Browser automatically includes the<br/>`__session` cookie in the request headers.
 
     Backend->>Clerk: Middleware/helper uses token to fetch current user's state
     Clerk-->>Backend: Returns session and user details (e.g., userId)
@@ -83,7 +83,7 @@ We use Clerk's middleware to protect routes that require authentication. The log
 graph TD
     A[Incoming Request] --> B{middleware.ts};
     B -- "Is it a protected route?" --> C{createRouteMatcher};
-    C -- "Yes" --> D{auth().protect()};
+    C -- "Yes" --> D{"auth().protect()<br/>(Enforce Authentication)"};
     C -- "No" --> E[Allow Request];
     D -- "Is user authenticated?" --> F{Valid JWT?};
     F -- "Yes" --> E;

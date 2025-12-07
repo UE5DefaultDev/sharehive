@@ -19,25 +19,25 @@ This flow details how a new user is created and how their data is synchronized b
 ```mermaid
 sequenceDiagram
     participant User
-    participant Client [Browser (Clerk UI)]
+    participant ClientBrowser [Browser]
     participant Clerk
-    participant Backend [Next.js API Route<br>/api/webhook/clerk]
-    participant DB [Neon DB (PostgreSQL)]
+    participant BackendWebhook [Next.js API Route]
+    participant DB [Neon DB]
 
-    User->>Client: Clicks "Sign Up" button
-    Client->>Clerk: Initiates sign-up flow (displays Clerk's form)
+    User->>ClientBrowser: Clicks "Sign Up" button
+    ClientBrowser->>Clerk: Initiates sign-up flow (displays Clerk's form)
     User->>Clerk: Submits registration form (e.g., email & password)
     Clerk->>Clerk: Creates user record in its own system
     
     par
-        Clerk-->>Client: Returns session JWT (in cookie)
-        Client-->>User: Logs user in and redirects
+        Clerk-->>ClientBrowser: Returns session JWT (in cookie)
+        ClientBrowser-->>User: Logs user in and redirects
     and
-        Clerk-->>Backend: Sends `user.created` webhook (POST Request, JSON body)
-        Backend->>Backend: Verifies webhook signature
-        Backend->>DB: `prisma.user.create()` using Clerk user ID and email
-        DB-->>Backend: Confirms user creation
-        Backend-->>Clerk: Returns `200 OK`
+        Clerk-->>BackendWebhook: Sends `user.created` webhook (POST Request, JSON body)
+        BackendWebhook->>BackendWebhook: Verifies webhook signature
+        BackendWebhook->>DB: `prisma.user.create()` using Clerk user ID and email
+        DB-->>BackendWebhook: Confirms user creation
+        BackendWebhook-->>Clerk: Returns `200 OK`
     end
 ```
 - **Initiator**: User action.
@@ -53,27 +53,27 @@ This flow illustrates the use of a Next.js Server Action to handle form submissi
 ```mermaid
 sequenceDiagram
     participant User
-    participant Client [CreateCourse.tsx]
-    participant Server [course.action.ts]
-    participant Auth [Clerk (Server-side)]
+    participant ClientCreateCourse [CreateCourse.tsx]
+    participant ServerCourseAction [course.action.ts]
+    participant AuthClerkServer [Clerk (Server-side)]
     participant DB [Neon DB (Prisma)]
 
-    User->>Client: Fills and submits the "New Course" form
-    Client->>Server: Invokes `createCourse(formData)`
-    note right of Server: This is a direct, type-safe RPC call,<br>not a traditional HTTP request.
+    User->>ClientCreateCourse: Fills and submits the "New Course" form
+    ClientCreateCourse->>ServerCourseAction: Invokes `createCourse(formData)`
+    note right of ServerCourseAction: This is a direct, type-safe RPC call,<br/>not a traditional HTTP request.
 
-    Server->>Auth: `currentUser()`
-    Auth-->>Server: Returns authenticated user object
+    ServerCourseAction->>AuthClerkServer: `currentUser()`
+    AuthClerkServer-->>ServerCourseAction: Returns authenticated user object
     alt User is Authenticated
-        Server->>Server: Validates form data
-        Server->>DB: `prisma.course.create({ data: { title: ..., authorId: ... } })`
-        DB-->>Server: Returns the newly created course object
-        Server->>Server: `revalidatePath('/courses')` to invalidate cache
-        Server-->>Client: Returns success object
-        Client->>User: Displays "Success" notification
+        ServerCourseAction->>ServerCourseAction: Validates form data
+        ServerCourseAction->>DB: `prisma.course.create({ data: { title: ..., authorId: ... } })`
+        DB-->>ServerCourseAction: Returns the newly created course object
+        ServerCourseAction->>ServerCourseAction: `revalidatePath('/courses')` to invalidate cache
+        ServerCourseAction-->>ClientCreateCourse: Returns success object
+        ClientCreateCourse->>User: Displays "Success" notification
     else User is Not Authenticated
-        Server-->>Client: Throws/returns authentication error
-        Client->>User: Displays "Error" notification
+        ServerCourseAction-->>ClientCreateCourse: Throws/returns authentication error
+        ClientCreateCourse->>User: Displays "Error" notification
     end
 ```
 - **Initiator**: User form submission.
@@ -89,34 +89,45 @@ This flow details the secure file upload process managed by UploadThing, which a
 ```mermaid
 sequenceDiagram
     participant User
-    participant Client [ImageUpload.tsx]
-    participant Backend [api/uploadthing/core.ts]
-    participant Auth [Clerk]
+    participant ClientImageUpload [ImageUpload.tsx]
+    participant BackendUploadThing [api/uploadthing/core.ts]
+    participant AuthClerk [Clerk]
     participant UploadThing
-    participant S3 [Cloud Storage]
+    participant S3CloudStorage [Cloud Storage]
     participant DB [Neon DB (Prisma)]
 
-    User->>Client: Selects an image file
-    Client->>Backend: Requests permission to upload for 'imageUploader' route
-    Backend->>Auth: `currentUser()` to verify session
-    Auth-->>Backend: Returns user
-    Backend-->>UploadThing: If authorized, requests a presigned URL
-    UploadThing-->>Client: Returns presigned URL (JSON)
-    
-    note over Client, S3: File is uploaded directly from browser to cloud storage.
-    Client->>S3: Uploads file binary via `PUT` request to presigned URL
-    S3-->>UploadThing: Confirms successful upload
-    
-    UploadThing-->>Backend: Sends `onUploadComplete` webhook (JSON)
-    Backend->>DB: `prisma.course.update({ where: ..., data: { image: file.url } })`
-    DB-->>Backend: Confirms update
-    Backend-->>UploadThing: Returns `200 OK`
-```
-- **Initiator**: User file selection.
-- **Data Format**: The file is sent as `binary` data. All other communication is `JSON`.
-- **Storage**: The file is stored in **UploadThing's S3 bucket**. The resulting file URL (a string) is stored in the `image` field of the `Course` table in our **Neon DB**.
+    User->>ClientImageUpload: Clicks upload button and selects a file
 
----
+    %% Step 1: Client requests permission
+    ClientImageUpload->>BackendUploadThing: POST request to get upload permission for 'imageUploader'
+
+    %% Step 2: Backend authorizes the user
+    BackendUploadThing->>AuthClerk: `currentUser()`
+    AuthClerk-->>BackendUploadThing: Returns user object
+    alt User is Authenticated
+        %% Step 3: Backend gets a presigned URL from UploadThing
+        BackendUploadThing->>UploadThing: Request presigned URL for the file
+        UploadThing-->>ClientImageUpload: Return presigned URL (JSON)
+    else User is Not Authenticated
+        BackendUploadThing-->>ClientImageUpload: Return 403 Forbidden error
+    end
+    
+    %% Step 4: Client uploads the file directly to S3
+    ClientImageUpload->>S3CloudStorage: PUT request with file binary to the presigned URL
+    note over ClientImageUpload, S3CloudStorage: Our server is not involved in this transfer.
+
+    %% Step 5: S3 confirms, and UploadThing triggers the completion callback
+    S3CloudStorage-->>UploadThing: Confirms successful upload
+    UploadThing->>BackendUploadThing: POST request (webhook) to `onUploadComplete` handler
+    
+    %% Step 6: Backend saves the file URL to the database
+    BackendUploadThing->>DB: `prisma.course.update({ data: { image: file.url } })`
+    DB-->>BackendUploadThing: Confirms database update
+    BackendUploadThing-->>UploadThing: Returns `200 OK`
+    
+    %% Step 7: Client is notified of completion
+    ClientImageUpload->>User: Display "Upload Complete" notification
+```
 
 ### 4. Data Flow: Reading Course Data (Server Component)
 

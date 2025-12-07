@@ -28,13 +28,13 @@ UI components are the building blocks of the user interface. They are located in
 ```mermaid
 graph TD
     subgraph "CreateCourse.tsx (Client Component)"
-        A["React State (useState)<br>Manages form input values"]
-        B["UI (JSX)<br>Renders <form>, <Input>, <Button>"]
-        C["Form Submission Handler<br>Invokes Server Action"]
+        A["React State (useState)<br/>Manages form input values"]
+        B["UI (JSX)<br/>Renders <form>, <Input>, <Button>"]
+        C["Form Submission Handler<br/>Invokes Server Action"]
     end
     
     subgraph "Backend"
-       D["course.action.ts<br>(Server Action)"]
+       D["course.action.ts<br/>(Server Action)"]
     end
 
     A -- "Populates" --> B
@@ -57,13 +57,13 @@ graph TD
     end
 
     subgraph "CommentSection.tsx (Client Component)"
-        A["Props<br>Receives initial comments"]
-        B["UI (JSX)<br>Renders comments and a <form>"]
-        C["Form Handler<br>Invokes `addComment` Server Action"]
+        A["Props<br/>Receives initial comments"]
+        B["UI (JSX)<br/>Renders comments and a <form>"]
+        C["Form Handler<br/>Invokes `addComment` Server Action"]
     end
     
     subgraph "Backend"
-        D["comment.action.ts<br>(Server Action)"]
+        D["comment.action.ts<br/>(Server Action)"]
     end
 
     P -- "Passes initial data" --> A
@@ -102,6 +102,8 @@ sequenceDiagram
     participant DB [Prisma Client]
 
     Client->>Server: Invokes `createCourse(formData)`
+    note right of Server: This is a direct, type-safe RPC call,<br/>not a traditional HTTP request.
+
     Server->>Auth: `currentUser()` to get user ID
     Auth-->>Server: Returns user object
     Server->>Server: Validates `formData`
@@ -125,11 +127,11 @@ sequenceDiagram
 
 ```mermaid
 graph TD
-    A[UploadThing Client] -- "1. Requests upload for 'imageUploader' endpoint" --> B{api/uploadthing/core.ts}
+    A[UploadThing Client] -- "1. Requests upload permission for 'imageUploader' endpoint" --> B{"api/uploadthing/core.ts"}
     
     subgraph B
-        C["Middleware<br>Verifies user is authenticated via Clerk"]
-        D["`onUploadComplete`<br>Callback function"]
+        C["Middleware<br/>Verifies user is authenticated via Clerk"]
+        D["onUploadComplete<br/>Callback function"]
     end
     
     B -- "2. Executes Middleware" --> C

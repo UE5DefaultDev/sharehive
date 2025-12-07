@@ -28,7 +28,7 @@ graph TD
     
     subgraph "Data & Services Layer"
         D[Clerk User Management]
-        E[Neon DB (PostgreSQL)]
+        E["Neon DB - PostgreSQL"]
         F[UploadThing File Storage]
     end
 
@@ -62,38 +62,38 @@ The diagram below maps out the entire `sharehive` project directory, explaining 
 ```mermaid
 graph TD
     subgraph "Project Root: sharehive/"
-        A["package.json<br>(Dependencies & Scripts)"]
-        B["next.config.ts<br>(Next.js Configuration)"]
-        C["middleware.ts<br>(Clerk Auth Protection)"]
-        D["/app<br>(Application Code)"]
-        E["/components<br>(UI Components)"]
-        F["/lib<br>(Shared Utilities)"]
-        G["/actions<br>(Server Actions)"]
-        H["/prisma<br>(Database Schema)"]
-        I["/public<br>(Static Assets)"]
+        A["package.json<br>Dependencies & Scripts"]
+        B["next.config.ts<br>Next.js Configuration"]
+        C["middleware.ts<br>Clerk Auth Protection"]
+        D["/app<br>Application Code"]
+        E["/components<br>UI Components"]
+        F["/lib<br>Shared Utilities"]
+        G["/actions<br>Server Actions"]
+        H["/prisma<br>Database Schema"]
+        I["/public<br>Static Assets"]
     end
 
     subgraph "/app"
-        D1["layout.tsx<br>(Root UI Shell)"]
-        D2["page.tsx<br>(Home Page)"]
-        D3["/course/[courseId]<br>(Dynamic Course Page)"]
-        D4["/api/uploadthing<br>(UploadThing Route Handler)"]
+        D1["layout.tsx<br>Root UI Shell"]
+        D2["page.tsx<br>Home Page"]
+        D3["/course/[courseId]<br>Dynamic Course Page"]
+        D4["/api/uploadthing<br>UploadThing Route Handler"]
     end
 
     subgraph "/components"
-        E1["/ui<br>(shadcn/ui Primitives)"]
-        E2["CourseCard.tsx<br>(Displays Course Info)"]
-        E3["CreateCourse.tsx<br>(Course Creation Form)"]
+        E1["/ui<br>shadcn/ui Primitives"]
+        E2["CourseCard.tsx<br>Displays Course Info"]
+        E3["CreateCourse.tsx<br>Course Creation Form"]
     end
 
     subgraph "/lib"
-        F1["prisma.ts<br>(Prisma Client Instance)"]
-        F2["utils.ts<br>(General Helper Functions)"]
+        F1["prisma.ts<br>Prisma Client Instance"]
+        F2["utils.ts<br>General Helper Functions"]
     end
     
     subgraph "/prisma"
-        H1["schema.prisma<br>(Database Models & Relations)"]
-        H2["/migrations<br>(DB Migration History)"]
+        H1["schema.prisma<br>Database Models & Relations"]
+        H2["/migrations<br>DB Migration History"]
     end
 
     C -- "Uses Clerk helpers" --> F

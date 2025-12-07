@@ -19,22 +19,22 @@ Our scalability strategy is to **distribute load and delegate specialized tasks*
 
 ```mermaid
 graph TD
-    A[User Traffic] --> B{Vercel Edge Network};
+    A[User Traffic] --> B{Vercel Edge Network}
     
     subgraph "Vercel Platform"
-        B --> C[Static Assets (CDN)];
-        B --> D[Server Components / API Routes<br>(Serverless Functions)];
+        B --> C["Static Assets (CDN)"]
+        B --> D["Server Components / API Routes<br/>(Serverless Functions)"]
     end
     
     subgraph "Specialized Services"
-        E[Clerk<br>(Scalable Auth)];
-        F[Neon DB<br>(Serverless PostgreSQL)];
-        G[UploadThing<br>(Scalable File Storage)];
+        E["Clerk<br/>(Scalable Auth)"]
+        F["Neon DB<br/>(Serverless PostgreSQL)"]
+        G["UploadThing<br/>(Scalable File Storage)"]
     end
 
-    D --> E;
-    D --> F;
-    D --> G;
+    D --> E
+    D --> F
+    D --> G
 ```
 - **Vercel Edge**: Handles initial requests, serving cached content globally.
 - **Serverless Functions**: Backend logic scales on-demand with traffic.
@@ -48,30 +48,30 @@ graph TD
 ```mermaid
 graph LR
     subgraph "Global Users"
-        U1[User in USA]
-        U2[User in Europe]
-        U3[User in Asia]
+        U1["User in USA"]
+        U2["User in Europe"]
+        U3["User in Asia"]
     end
     
     subgraph "Vercel Edge Network"
-        E1[Edge Node (USA)]
-        E2[Edge Node (Europe)]
-        E3[Edge Node (Asia)]
+        E1["Edge Node (USA)"]
+        E2["Edge Node (Europe)"]
+        E3["Edge Node (Asia)"]
     end
     
     C[Origin Server / Serverless Function]
 
-    U1 --> E1;
-    U2 --> E2;
-    U3 --> E3;
+    U1 --> E1
+    U2 --> E2
+    U3 --> E3
     
-    E1 -- "Cached" --> U1;
-    E2 -- "Cached" --> U2;
-    E3 -- "Cached" --> U3;
+    E1 -- "Cached" --> U1
+    E2 -- "Cached" --> U2
+    E3 -- "Cached" --> U3
 
-    E1 -- "First request fetches from" --> C;
-    E2 -- "First request fetches from" --> C;
-    E3 -- "First request fetches from" --> C;
+    E1 -- "First request fetches from" --> C
+    E2 -- "First request fetches from" --> C
+    E3 -- "First request fetches from" --> C
 ```
 - **Static Assets**: JavaScript, CSS, and images are cached aggressively at the edge, closest to the user, resulting in very low latency.
 - **Server-Rendered Pages**: Even dynamically rendered pages can be cached at the edge for a short period, reducing the load on the backend functions.
@@ -83,12 +83,12 @@ graph LR
 
 ```mermaid
 graph TD
-    A[Incoming Traffic] --> B{Load Balancer (Managed by Vercel)};
-    B --> F1["Function Instance 1"];
-    B --> F2["Function Instance 2"];
-    B --> F3["Function Instance 3"];
-    B --> Fx["..."];
-    B --> FN["Function Instance N<br>(Scaled up automatically)"];
+    A[Incoming Traffic] --> B{"Load Balancer<br/>(Managed by Vercel)"}
+    B --> F1["Function Instance 1"]
+    B --> F2["Function Instance 2"]
+    B --> F3["Function Instance 3"]
+    B --> Fx["..."]
+    B --> FN["Function Instance N<br/>(Scaled up automatically)"]
 ```
 - **Concurrency**: This model allows for massive concurrency. A spike in traffic to one API endpoint does not impact the performance of others.
 - **Cost-Effectiveness**: We only pay for compute time when a function is active, making it highly efficient for applications with variable traffic.
@@ -105,9 +105,9 @@ graph TD
     end
     
     subgraph "Neon DB"
-        B["Connection Pooler<br>(Manages incoming connections)"]
-        C["Compute Node<br>(Executes queries, autoscales CPU/RAM)"]
-        D["Storage Layer<br>(Durable, scalable data storage)"]
+        B["Connection Pooler<br/>(Manages incoming connections)"]
+        C["Compute Node<br/>(Executes queries, autoscales CPU/RAM)"]
+        D["Storage Layer<br/>(Durable, scalable data storage)"]
     end
     
     A -- "SQL Queries" --> B;

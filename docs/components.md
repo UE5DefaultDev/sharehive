@@ -6,11 +6,11 @@ This document provides a detailed breakdown of the application's key components,
 
 ### Table of Contents
 
-1. [UI Components](#1-ui-components)
-   - [CreateCourse.tsx](#createtcourse-tsx)
-   - [CommentSection.tsx](#commentsection-tsx)
-   - [ImageUpload.tsx](#imageupload-tsx)
-2. [Backend Logic Components](#2-backend-logic-components)
+1. [UI Components](#ui-components)
+   - [CreateCourse.tsx](#createcourtsetsx)
+   - [CommentSection.tsx](#commentsectiontsx)
+   - [ImageUpload.tsx](#imageuploadtsx)
+2. [Backend Logic Components](#backend-logic-components)
    - [Server Action: `course.action.ts`](#server-action-courseactionts)
    - [API Route: `api/uploadthing/core.ts`](#api-route-apiuploadthingcorets)
 
@@ -29,8 +29,8 @@ UI components are the building blocks of the user interface. They are located in
 ```mermaid
 graph TD
     subgraph "CreateCourse.tsx (Client Component)"
-        A["React State (useState)<br/>Manages form input values"]
-        B["UI (JSX)<br/>Renders <form>, <Input>, <Button>"]
+        A["React State (useState)<br/>Manages form input values for dynamic UI (automatic reload)"]
+        B["UI (JSX)<br/>Renders form, Input, Button"]
         C["Form Submission Handler<br/>Invokes Server Action"]
     end
 
@@ -97,10 +97,6 @@ These components handle the application's business logic on the server.
 
 ```mermaid
 sequenceDiagram
-    participant Client [CreateCourse.tsx]
-    participant Server [course.action.ts]
-    participant Auth [Clerk]
-    participant DB [Prisma Client]
 
     Client->>Server: Invokes `createCourse(formData)`
     note right of Server: This is a direct, type-safe RPC call,<br/>not a traditional HTTP request.

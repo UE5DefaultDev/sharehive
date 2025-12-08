@@ -34,27 +34,26 @@ graph TD
     end
 
     A -- "Authenticates Against" --> D
-    D -- "Issues JWT To" --> A
-    A -- "Makes Authenticated Requests With JWT To" --> C
-    C -- "Verifies JWT With" --> D
+    D -- "Issues JSON Web Token To" --> A
+    A -- "Makes Authenticated Requests With JSON Web Token To" --> C
+    C -- "Verifies JSON Web Token With" --> D
     C -- "Reads/Writes User Data To" --> E
     D -- "Syncs User Via Webhook To" --> C
 ```
 
-| Component             | Responsibility                                                                                          |
-| :-------------------- | :------------------------------------------------------------------------------------------------------ |
-| **Clerk UI**          | Renders login/signup forms and manages user interactions.                                               |
-| **Clerk Service**     | Creates users, validates credentials, issues JSON Web Tokens (JWTs), and manages sessions.              |
-| **ShareHive Backend** | Verifies JWTs from incoming requests and synchronizes user profiles into its own database via webhooks. |
+| Component             | Responsibility                                                                                                     |
+| :-------------------- | :----------------------------------------------------------------------------------------------------------------- |
+| **Clerk UI**          | Renders login/signup forms and manages user interactions.                                                          |
+| **Clerk Service**     | Creates users, validates credentials, issues JSON Web Tokens (JSON Web Tokens), and manages sessions.              |
+| **ShareHive Backend** | Verifies JSON Web Tokens from incoming requests and synchronizes user profiles into its own database via webhooks. |
 
-### 2. Session Management and JWT Flow
+### 2. Session Management and Json Web Token (JWT) Flow
 
-Clerk uses JWTs to manage sessions. When a user logs in, Clerk's service generates a short-lived session token and stores it in a secure, `HttpOnly` cookie. This token is automatically included in all subsequent requests to our Next.js backend.
+Clerk uses JWTs to manage sessions. When a user logs in, Clerk's service generates a short-lived session token and stores it in a secure, `HttpOnly` cookie, to which javascript has no access. This token is automatically included in all subsequent requests to our Next.js backend.
 
 ```mermaid
 sequenceDiagram
-    participant Client [Browser]
-    participant Backend [Next.js Server]
+
     participant Clerk
 
     Client->>Clerk: User logs in

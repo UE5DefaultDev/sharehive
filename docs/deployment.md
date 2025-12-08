@@ -24,7 +24,6 @@ The entire process, from code push to live deployment, is automated.
 
 ```mermaid
 sequenceDiagram
-    participant Dev [Developer]
     participant GitHub
     participant Vercel
     participant DB [Neon DB]

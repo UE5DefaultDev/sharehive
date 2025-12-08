@@ -49,7 +49,6 @@ This diagram shows the detailed, step-by-step process for a user uploading a fil
 ```mermaid
 sequenceDiagram
     participant User
-    participant Client [ImageUpload.tsx]
     participant Backend [api/uploadthing/core.ts]
     participant Auth [Clerk]
     participant UploadThing

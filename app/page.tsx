@@ -19,6 +19,7 @@ import CreateCourse from "@/components/CreateCourse";
 import { currentUser } from "@clerk/nextjs/server";
 // Import the function to get the database ID of the current user.
 import { getDbUserId } from "@/actions/user.action";
+import Sidebar from "@/components/Sidebar";
 
 /**
  * The Home component for the main page.
@@ -36,24 +37,29 @@ export default async function Home() {
 
   return (
     // The main grid layout for the homepage.
-    <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
-      {/* The central column for the course feed. */}
-      <div className="lg:col-span-6">
-        {/* Conditionally render the CreateCourse component if a user is logged in. */}
-        {user ? <CreateCourse /> : null}
-
-        {/* The feed of courses. */}
-        <div className="space-y-6">
-          {/* Map through the fetched courses and render a CourseCard for each one. */}
-          {courses.map((course) => (
-            <CourseCard key={course.id} course={course} dbUserId={dbUserId} />
-          ))}
+    <div className="container mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
+        <div className="lg:col-span-3">
+          <Sidebar />
         </div>
-      </div>
+        {/* The central column for the course feed. */}
+        <div className="lg:col-span-6">
+          {/* Conditionally render the CreateCourse component if a user is logged in. */}
+          {user ? <CreateCourse /> : null}
 
-      {/* The right-side column for notifications, hidden on smaller screens. */}
-      <div className="hidden lg:col-span-4 lg:block sticky top-20">
-        Notifications
+          {/* The feed of courses. */}
+          <div className="space-y-6">
+            {/* Map through the fetched courses and render a CourseCard for each one. */}
+            {courses.map((course) => (
+              <CourseCard key={course.id} course={course} dbUserId={dbUserId} />
+            ))}
+          </div>
+        </div>
+
+        {/* The right-side column for notifications, hidden on smaller screens. */}
+        <div className="hidden lg:col-span-4 lg:block sticky top-20">
+          Notifications
+        </div>
       </div>
     </div>
   );

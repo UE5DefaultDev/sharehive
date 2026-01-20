@@ -11,13 +11,28 @@ import {
   HomeIcon,
   LogOutIcon,
   MenuIcon,
+  MessageSquareText,
   MoonIcon,
   SunIcon,
   UserIcon,
 } from "lucide-react";
 // Import UI components.
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 // Import React hooks for state management.
 import { useState } from "react";
 // Import Clerk hooks for authentication.
@@ -25,6 +40,13 @@ import { useAuth, SignInButton, SignOutButton } from "@clerk/nextjs";
 // Import the useTheme hook from next-themes for theme management.
 import { useTheme } from "next-themes";
 import Link from "next/link";
+import { ChatList } from "./ChatList";
+import { SidebarProvider } from "./ui/sidebar";
+
+type Course = {
+  id: string;
+  title: string;
+};
 
 /**
  * The MobileNavbar component.
@@ -32,7 +54,7 @@ import Link from "next/link";
  *
  * @returns {JSX.Element} The JSX for the mobile navigation bar.
  */
-function MobileNavbar() {
+function MobileNavbar({ courses = [] }: { courses?: Course[] }) {
   // State to control the visibility of the mobile menu.
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   // Get the user's authentication status from Clerk.
@@ -41,8 +63,31 @@ function MobileNavbar() {
   const { theme, setTheme } = useTheme();
 
   return (
-    // The main container for the mobile navbar, hidden on larger screens.
+    // The main container for the mobile Chatbar, hidden on larger screens.
     <div className="flex md:hidden items-center space-x-2">
+      {isSignedIn && (
+        <Drawer>
+          <DrawerTrigger asChild>
+            <Button variant="ghost" size="icon" className="mr-2">
+              <MessageSquareText className="h-5 w-5" />
+            </Button>
+          </DrawerTrigger>
+          <DrawerContent className="h-[90vh]">
+            <div className="mx-auto w-full max-w-sm h-full flex flex-col">
+              <DrawerHeader>
+                <DrawerTitle>Chats</DrawerTitle>
+                <DrawerDescription>Select a course chat.</DrawerDescription>
+              </DrawerHeader>
+              <div className="p-4 pb-8 flex-1 overflow-auto">
+                <SidebarProvider className="min-h-fit">
+                  <ChatList courses={courses} />
+                </SidebarProvider>
+              </div>
+            </div>
+          </DrawerContent>
+        </Drawer>
+      )}
+
       {/* The theme toggle button. */}
       <Button
         variant="ghost"
@@ -70,7 +115,11 @@ function MobileNavbar() {
           </SheetHeader>
           <nav className="flex flex-col space-y-4 mt-6">
             {/* The home page link. */}
-            <Button variant="ghost" className="flex items-center gap-3 justify-start" asChild>
+            <Button
+              variant="ghost"
+              className="flex items-center gap-3 justify-start"
+              asChild
+            >
               <Link href="/">
                 <HomeIcon className="w-4 h-4" />
                 Home
@@ -81,14 +130,22 @@ function MobileNavbar() {
             {isSignedIn ? (
               <>
                 {/* The notifications page link. */}
-                <Button variant="ghost" className="flex items-center gap-3 justify-start" asChild>
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-3 justify-start"
+                  asChild
+                >
                   <Link href="/notifications">
                     <BellIcon className="w-4 h-4" />
                     Notifications
                   </Link>
                 </Button>
                 {/* The profile page link. */}
-                <Button variant="ghost" className="flex items-center gap-3 justify-start" asChild>
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-3 justify-start"
+                  asChild
+                >
                   <Link href="/profile">
                     <UserIcon className="w-4 h-4" />
                     Profile
@@ -96,7 +153,10 @@ function MobileNavbar() {
                 </Button>
                 {/* The sign-out button. */}
                 <SignOutButton>
-                  <Button variant="ghost" className="flex items-center gap-3 justify-start w-full">
+                  <Button
+                    variant="ghost"
+                    className="flex items-center gap-3 justify-start w-full"
+                  >
                     <LogOutIcon className="w-4 h-4" />
                     Logout
                   </Button>

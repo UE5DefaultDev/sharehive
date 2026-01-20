@@ -30,6 +30,7 @@ model User {
   coursesCreated Course[] @relation("coursesCreated") //One-to-Many
   followedCourses Course[] @relation("CourseFollows")
   comments Comment[] @relation("UserComments")
+  messages Message[] @relation("UserMessages")
 }
 
 model Course {
@@ -45,6 +46,7 @@ model Course {
   author    User     @relation("coursesCreated", fields: [authorId], references: [id], onDelete: Cascade) // cascade delete means delete all posts if author is deleted
   followedBy User[] @relation("CourseFollows")
   comments Comment[] @relation("CourseComments")
+  messages Message[] @relation("CourseMessages")
 }
 
 model Comment {
@@ -57,5 +59,18 @@ model Comment {
   author   User   @relation("UserComments", fields: [authorId], references: [id], onDelete: Cascade)
   authorId String
   course   Course @relation("CourseComments", fields: [courseId], references: [id], onDelete: Cascade)
+  courseId String
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  author   User   @relation("UserMessages", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+  course   Course @relation("CourseMessages", fields: [courseId], references: [id], onDelete: Cascade)
   courseId String
 }

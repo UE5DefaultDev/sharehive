@@ -3,7 +3,7 @@
  * It includes links to the home page, notifications, and profile, as well as a sign-in button and user profile button.
  */
 // Import icons from lucide-react.
-import { BellIcon, HomeIcon, UserIcon } from "lucide-react";
+import { BellIcon, HomeIcon, MessageSquareText, UserIcon } from "lucide-react";
 // Import UI components.
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -48,12 +48,20 @@ async function DesktopNavbar() {
               <span className="hidden lg:inline">Notifications</span>
             </Link>
           </Button>
+          {/* The chats page link. */}
+          <Button variant="ghost" className="flex items-center gap-2" asChild>
+            <Link href="/chats">
+              <MessageSquareText className="w-4 h-4" />
+              <span className="hidden lg:inline">Chats</span>
+            </Link>
+          </Button>
           {/* The profile page link. */}
           <Button variant="ghost" className="flex items-center gap-2" asChild>
             <Link
               href={`/profile/${
                 // Use the username or generate one from the email address.
-                user.username ?? user.emailAddresses[0].emailAddress.split("@")[0]
+                user.username ??
+                user.emailAddresses[0].emailAddress.split("@")[0]
               }`}
             >
               <UserIcon className="w-4 h-4" />

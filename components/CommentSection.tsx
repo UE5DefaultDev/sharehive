@@ -17,7 +17,7 @@ import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { Avatar, AvatarImage } from "./ui/avatar";
 // Import a date formatting function.
-import { formatDistanceToNow } from "date-fns";
+import { formatDistance } from "date-fns";
 // Import the Link component for navigation.
 import Link from "next/link";
 
@@ -125,7 +125,9 @@ export function CommentSection({ courseId, comments }: CommentSectionProps) {
                 </Link>
                 {/* Display the time since the comment was posted. */}
                 <span className="text-sm text-muted-foreground">
-                  {formatDistanceToNow(new Date(comment.createdAt))} ago
+                  {formatDistance(new Date(comment.createdAt), new Date(), {
+                    addSuffix: true,
+                  })}
                 </span>
               </div>
               <p className="text-sm">{comment.text}</p>

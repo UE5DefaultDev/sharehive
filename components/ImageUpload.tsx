@@ -5,11 +5,9 @@
  */
 "use client";
 
-// Import the UploadDropzone component from the uploadthing library.
 import { UploadDropzone } from "@/lib/uploadthing";
-// Import the XIcon for the remove button.
 import { XIcon } from "lucide-react";
-// Import the file router type from the uploadthing API route.
+// OurFileRouter defines the available upload endpoints (postImage, courseImage) with their size limits.
 import { OurFileRouter } from "@/app/api/uploadthing/core";
 
 // Define the props for the ImageUpload component.
@@ -31,7 +29,11 @@ function ImageUpload({ endpoint, onChange, value }: ImageUploadProps) {
   if (value) {
     return (
       <div className="relative size-40">
-        <img src={value} alt="Upload" className="rounded-md size-40 object-cover" />
+        <img
+          src={value}
+          alt="Upload"
+          className="rounded-md size-40 object-cover"
+        />
         {/* The button to remove the uploaded image. */}
         <button
           onClick={() => onChange("")}
@@ -52,7 +54,6 @@ function ImageUpload({ endpoint, onChange, value }: ImageUploadProps) {
         onChange(res?.[0].url);
       }}
       onUploadError={(error: Error) => {
-        // Log any errors that occur during the upload.
         console.log(error);
       }}
     />

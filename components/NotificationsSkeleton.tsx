@@ -1,3 +1,9 @@
+/**
+ * This file defines the NotificationsSkeleton component, which displays a loading skeleton
+ * for the notifications interface while actual notification data is being fetched.
+ * It provides a visual placeholder that improves perceived performance and user experience.
+ */
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";

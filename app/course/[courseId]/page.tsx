@@ -1,3 +1,4 @@
+// Displays detailed course information and comments.
 import { getCourseById } from "@/actions/course.action";
 import { CommentSection } from "@/components/CommentSection";
 import CourseCard from "@/components/CourseCard";

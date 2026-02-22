@@ -1,3 +1,4 @@
+// Server component for fetching and displaying user profile data.
 import {
   getProfileByUsername,
   getUserCourses,

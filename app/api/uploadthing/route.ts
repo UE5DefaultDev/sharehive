@@ -1,3 +1,4 @@
+// Exposes the UploadThing API route handlers.
 import { createRouteHandler } from "uploadthing/next";
 
 import { ourFileRouter } from "./core";

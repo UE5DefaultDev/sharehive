@@ -1,3 +1,4 @@
+// Renders the chat interface for a specific course.
 import { getCourseById } from "@/actions/course.action";
 import { getCourseMessages } from "@/actions/message.action";
 import { getDbUserId } from "@/actions/user.action";
@@ -16,14 +17,13 @@ export default async function ChatPage({
 
   if (!course || !dbUserId) {
     if (!course) notFound();
-    return null; // Or redirect to login
+    return null;
   }
 
   const messages = await getCourseMessages(courseId);
 
   return (
     <div className="flex h-full w-full flex-col bg-background/50">
-      {/* Header */}
       <div className="border-b px-6 py-3 flex items-center justify-between bg-card shadow-sm z-10">
         <div>
           <h1 className="text-lg font-bold flex items-center gap-2">

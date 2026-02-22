@@ -1,6 +1,6 @@
 "use client";
 
-import { createMessage } from "@/actions/message.action";
+import { createMessage, getNewMessages } from "@/actions/message.action";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,6 +49,42 @@ export function ChatInterface({
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Poll for new messages
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (messages.length === 0) return;
+
+      const lastMessage = messages[messages.length - 1];
+      const lastMessageDate = lastMessage.createdAt;
+
+      // Handle both Date objects and strings (serialized from server)
+      const dateString =
+        lastMessageDate instanceof Date
+          ? lastMessageDate.toISOString()
+          : new Date(lastMessageDate).toISOString();
+
+      try {
+        const newMsgs = await getNewMessages(courseId, dateString);
+
+        if (newMsgs && newMsgs.length > 0) {
+          setMessages((prev) => {
+            const existingIds = new Set(prev.map((m) => m.id));
+            const uniqueNewMsgs = newMsgs.filter(
+              (m) => !existingIds.has(m.id)
+            ) as Message[];
+
+            if (uniqueNewMsgs.length === 0) return prev;
+            return [...prev, ...uniqueNewMsgs];
+          });
+        }
+      } catch (error) {
+        console.error("Polling error", error);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [messages, courseId]);
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;

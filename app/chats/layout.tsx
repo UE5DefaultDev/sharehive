@@ -1,3 +1,4 @@
+// Layout for the chats section, including sidebar.
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { DesktopChatBar } from "@/components/DesktopChatbar";
 

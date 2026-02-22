@@ -1,3 +1,7 @@
+/*
+Combines DesktopNavbar and MobileNavbar for easier implementation across the app
+*/
+
 import Link from "next/link";
 import React from "react";
 import DesktopNavbar from "./DesktopNavbar";

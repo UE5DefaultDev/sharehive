@@ -5,7 +5,6 @@
  */
 "use client";
 
-// Import icons from lucide-react.
 import {
   BellIcon,
   HomeIcon,
@@ -16,7 +15,7 @@ import {
   SunIcon,
   UserIcon,
 } from "lucide-react";
-// Import UI components.
+
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -33,11 +32,11 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-// Import React hooks for state management.
+
 import { useState } from "react";
-// Import Clerk hooks for authentication.
+
 import { useAuth, SignInButton, SignOutButton } from "@clerk/nextjs";
-// Import the useTheme hook from next-themes for theme management.
+
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { ChatList } from "./ChatList";
@@ -48,18 +47,10 @@ type Course = {
   title: string;
 };
 
-/**
- * The MobileNavbar component.
- * It renders the navigation bar for mobile views, including a theme toggle and a slide-out menu.
- *
- * @returns {JSX.Element} The JSX for the mobile navigation bar.
- */
 function MobileNavbar({ courses = [] }: { courses?: Course[] }) {
-  // State to control the visibility of the mobile menu.
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   // Get the user's authentication status from Clerk.
   const { isSignedIn } = useAuth();
-  // Get the current theme and the function to change it.
   const { theme, setTheme } = useTheme();
 
   return (
@@ -102,13 +93,12 @@ function MobileNavbar({ courses = [] }: { courses?: Course[] }) {
 
       {/* The slide-out menu (Sheet) for mobile navigation. */}
       <Sheet open={showMobileMenu} onOpenChange={setShowMobileMenu}>
-        {/* The trigger for the menu, which is a button with a menu icon. */}
         <SheetTrigger asChild>
           <Button variant="ghost" size="icon">
             <MenuIcon className="h-5 w-5" />
           </Button>
         </SheetTrigger>
-        {/* The content of the slide-out menu. */}
+        {/* Content of the slide-out menu. */}
         <SheetContent side="right" className="w-[300px]">
           <SheetHeader>
             <SheetTitle>Menu</SheetTitle>

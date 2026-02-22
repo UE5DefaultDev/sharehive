@@ -6,7 +6,7 @@ Sharehive is a full-stack web application designed as a platform for users to sh
 
 ---
 
-See [Docs](/docs/overview.md) for more in-depth information.
+See [Docs](/docs_legacy/overview.md) for more in-depth information.
 
 ---
 

@@ -1,3 +1,4 @@
+// Client component for rendering the user profile UI and handling interactions.
 "use client";
 import {
   getProfileByUsername,
@@ -97,7 +98,6 @@ function ProfilePageClient({
                 <p className="text-muted-foreground">@{user.username}</p>
                 <p className="mt-2 text-sm">{user.bio}</p>
 
-                {/* PROFILE STATS */}
                 <div className="w-full mt-6">
                   <div className="flex justify-around mb-4">
                     <div>
@@ -121,7 +121,6 @@ function ProfilePageClient({
                   </div>
                 </div>
 
-                {/* "FOLLOW & EDIT PROFILE" BUTTONS */}
                 {isOwnProfile ? (
                   <Button
                     className="w-full mt-4"
@@ -134,7 +133,6 @@ function ProfilePageClient({
                   <div></div>
                 )}
 
-                {/* LOCATION & WEBSITE */}
                 <div className="w-full mt-6 space-y-2 text-sm">
                   {user.location && (
                     <div className="flex items-center text-muted-foreground">
@@ -287,6 +285,7 @@ function ProfilePageClient({
             </div>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
     </div>
   );

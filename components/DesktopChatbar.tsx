@@ -1,3 +1,7 @@
+/*
+Displays a sidebar containing chats for courses the user is participating in.
+*/
+
 import { getParticipatingCourses } from "@/actions/course.action";
 import {
   Sidebar,
@@ -31,7 +35,7 @@ export async function DesktopChatBar() {
         <SidebarGroup>
           <SidebarGroupLabel>Course Chats</SidebarGroupLabel>
           <SidebarGroupContent>
-             <ChatList courses={courses} />
+            <ChatList courses={courses} />
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

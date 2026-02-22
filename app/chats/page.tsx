@@ -1,3 +1,4 @@
+// Default page for the chats route, prompting user selection.
 import { MessageSquareText } from "lucide-react";
 import React from "react";
 

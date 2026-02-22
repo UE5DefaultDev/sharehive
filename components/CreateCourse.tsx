@@ -4,7 +4,6 @@
  * It uses the 'use client' directive to indicate that this is a client-side component.
  */
 "use client";
-// Import the useUser hook from Clerk to get the current user's data.
 import { useUser } from "@clerk/nextjs";
 import React from "react";
 // Import UI components.
@@ -13,10 +12,10 @@ import { Avatar, AvatarImage } from "./ui/avatar";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { ImageIcon, Loader2Icon, SendIcon } from "lucide-react";
-// Import the server action for creating a course.
+
 import { createCourse } from "@/actions/course.action";
 import toast from "react-hot-toast";
-// Import the image upload component.
+
 import ImageUpload from "./ImageUpload";
 import { Input } from "./ui/input";
 
@@ -29,22 +28,13 @@ import { Input } from "./ui/input";
 function CreateCourse() {
   // Get the current user from Clerk.
   const { user } = useUser();
-  // State for the course title.
   const [title, setTitle] = React.useState("");
-  // State for the course content.
   const [content, setContent] = React.useState("");
-  // State for the course image URL.
   const [imageUrl, setImageUrl] = React.useState("");
-  // State to track if the course is being created.
   const [isPosting, setIsPosting] = React.useState(false);
-  // State to control the visibility of the image upload component.
   const [showImageUpload, setShowImageUpload] = React.useState(false);
 
-  /**
-   * Handles the submission of the new course.
-   */
   const handleSubmit = async () => {
-    // Do not submit if the title is empty, or if both content and image are empty.
     if (!title.trim() || (!content.trim() && !imageUrl)) return;
 
     setIsPosting(true);

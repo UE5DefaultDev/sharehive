@@ -46,3 +46,27 @@ export async function getCourseMessages(courseId: string) {
     },
   });
 }
+
+/**
+ * Retrieves new messages for a specific course created after a given timestamp.
+ *
+ * @param courseId - The ID of the course.
+ * @param after - The timestamp to fetch messages after.
+ * @returns A promise that resolves to an array of new messages.
+ */
+export async function getNewMessages(courseId: string, after: string) {
+  return prisma.message.findMany({
+    where: {
+      courseId,
+      createdAt: {
+        gt: new Date(after),
+      },
+    },
+    include: {
+      author: true,
+    },
+    orderBy: {
+      createdAt: "asc",
+    },
+  });
+}

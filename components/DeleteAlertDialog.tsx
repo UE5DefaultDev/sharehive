@@ -4,7 +4,6 @@
  */
 "use client";
 
-// Import icons from lucide-react.
 import { Loader2Icon, Trash2Icon } from "lucide-react";
 // Import UI components.
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,6 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-// Define the props for the DeleteAlertDialog component.
 interface DeleteAlertDialogProps {
   isDeleting: boolean;
   onDelete: () => Promise<void>;
@@ -43,7 +41,6 @@ export function DeleteAlertDialog({
 }: DeleteAlertDialogProps) {
   return (
     <AlertDialog>
-      {/* The trigger for the dialog, which is a button with a trash icon. */}
       <AlertDialogTrigger asChild>
         <Button
           variant="ghost"
@@ -65,9 +62,7 @@ export function DeleteAlertDialog({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          {/* The cancel button. */}
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          {/* The delete confirmation button. */}
           <AlertDialogAction
             onClick={onDelete}
             className="bg-red-500 hover:bg-red-600"

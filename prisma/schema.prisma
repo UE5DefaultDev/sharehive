@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,39 +8,41 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  username  String   @unique
-  clerkId   String   @unique
-  name      String?
-  bio       String?
-  image     String?
-  location  String?
-  website   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  coursesCreated Course[] @relation("coursesCreated") //One-to-Many
-  followedCourses Course[] @relation("CourseFollows")
-  comments Comment[] @relation("UserComments")
-  messages Message[] @relation("UserMessages")
+  id                             String     @id @default(cuid())
+  email                          String     @unique
+  username                       String     @unique
+  clerkId                        String     @unique
+  name                           String?
+  bio                            String?
+  image                          String?
+  location                       String?
+  website                        String?
+  createdAt                      DateTime   @default(now())
+  updatedAt                      DateTime   @updatedAt
+  publicKey                      String?
+  comments                       Comment[]  @relation("UserComments")
+  coursesCreated                 Course[]   @relation("coursesCreated")
+  KeyInbox_KeyInbox_fromIdToUser KeyInbox[] @relation("KeyInbox_fromIdToUser")
+  KeyInbox_KeyInbox_toIdToUser   KeyInbox[] @relation("KeyInbox_toIdToUser")
+  messages                       Message[]  @relation("UserMessages")
+  followedCourses                Course[]   @relation("CourseFollows")
+  keys                           UserKey[]  @relation("UserKeys")
+  deliveries                     MessageDelivery[] @relation("UserDeliveries")
 }
 
 model Course {
-  id        String   @id @default(cuid())
-  authorId  String
-  title     String
-  content   String?
-  image     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  author    User     @relation("coursesCreated", fields: [authorId], references: [id], onDelete: Cascade) // cascade delete means delete all posts if author is deleted
-  followedBy User[] @relation("CourseFollows")
-  comments Comment[] @relation("CourseComments")
-  messages Message[] @relation("CourseMessages")
+  id         String     @id @default(cuid())
+  authorId   String
+  title      String
+  content    String?
+  image      String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  comments   Comment[]  @relation("CourseComments")
+  author     User       @relation("coursesCreated", fields: [authorId], references: [id], onDelete: Cascade)
+  KeyInbox   KeyInbox[]
+  messages   Message[]  @relation("CourseMessages")
+  followedBy User[]     @relation("CourseFollows")
 }
 
 model Comment {
@@ -54,12 +50,10 @@ model Comment {
   text      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  // Relations
-  author   User   @relation("UserComments", fields: [authorId], references: [id], onDelete: Cascade)
-  authorId String
-  course   Course @relation("CourseComments", fields: [courseId], references: [id], onDelete: Cascade)
-  courseId String
+  authorId  String
+  courseId  String
+  author    User     @relation("UserComments", fields: [authorId], references: [id], onDelete: Cascade)
+  course    Course   @relation("CourseComments", fields: [courseId], references: [id], onDelete: Cascade)
 }
 
 model Message {
@@ -67,10 +61,46 @@ model Message {
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  authorId  String
+  courseId  String
+  author    User     @relation("UserMessages", fields: [authorId], references: [id], onDelete: Cascade)
+  course    Course   @relation("CourseMessages", fields: [courseId], references: [id], onDelete: Cascade)
+  deliveries MessageDelivery[] @relation("MessageDeliveries")
+}
 
-  // Relations
-  author   User   @relation("UserMessages", fields: [authorId], references: [id], onDelete: Cascade)
-  authorId String
-  course   Course @relation("CourseMessages", fields: [courseId], references: [id], onDelete: Cascade)
-  courseId String
+model KeyInbox {
+  id                         String   @id
+  fromId                     String
+  toId                       String
+  courseId                   String
+  encryptedKey               String
+  createdAt                  DateTime @default(now())
+  Course                     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  User_KeyInbox_fromIdToUser User     @relation("KeyInbox_fromIdToUser", fields: [fromId], references: [id], onDelete: Cascade)
+  User_KeyInbox_toIdToUser   User     @relation("KeyInbox_toIdToUser", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@index([toId, courseId])
+}
+
+model UserKey {
+  id             String   @id @default(cuid())
+  userId         String
+  publicKeyPem   String
+  keyFingerprint String
+  createdAt      DateTime @default(now())
+  revokedAt      DateTime?
+
+  user User @relation("UserKeys", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model MessageDelivery {
+  id                   String   @id @default(cuid())
+  messageId            String
+  recipientUserId      String
+  encryptedPayloadJson String   // JSON envelope: EncryptedMessageToRecipient
+  deliveredAt          DateTime?
+  readAt               DateTime?
+
+  message   Message @relation("MessageDeliveries", fields: [messageId], references: [id], onDelete: Cascade)
+  recipient User    @relation("UserDeliveries", fields: [recipientUserId], references: [id], onDelete: Cascade)
 }

@@ -6,6 +6,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "react-hot-toast";
+import { CryptoProvider } from "@/components/CryptoProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,12 +36,14 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <div className="h-screen flex flex-col overflow-hidden">
-              <Navbar />
-              <main className="flex-1 overflow-auto relative flex flex-col">
-                {children}
-              </main>
-            </div>
+            <CryptoProvider>
+              <div className="h-screen flex flex-col overflow-hidden">
+                <Navbar />
+                <main className="flex-1 overflow-hidden relative flex flex-col">
+                  {children}
+                </main>
+              </div>
+            </CryptoProvider>
             <Toaster />
           </ThemeProvider>
         </body>

@@ -48,25 +48,28 @@ export async function getCourseMessages(courseId: string) {
 }
 
 /**
- * Retrieves new messages for a specific course created after a given timestamp.
+ * Retrieves encrypted message deliveries for a specific course for the current user.
  *
  * @param courseId - The ID of the course.
- * @param after - The timestamp to fetch messages after.
- * @returns A promise that resolves to an array of new messages.
+ * @returns A promise that resolves to an array of encrypted payloads.
  */
-export async function getNewMessages(courseId: string, after: string) {
-  return prisma.message.findMany({
+export async function getEncryptedCourseMessages(courseId: string) {
+  const dbUserId = await getDbUserId();
+  if (!dbUserId) return [];
+
+  const deliveries = await prisma.messageDelivery.findMany({
     where: {
-      courseId,
-      createdAt: {
-        gt: new Date(after),
+      recipientUserId: dbUserId,
+      message: {
+        courseId,
       },
     },
-    include: {
-      author: true,
-    },
     orderBy: {
-      createdAt: "asc",
+      message: {
+        createdAt: "asc",
+      },
     },
   });
+
+  return deliveries.map((d) => JSON.parse(d.encryptedPayloadJson));
 }

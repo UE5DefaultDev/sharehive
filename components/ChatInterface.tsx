@@ -1,6 +1,6 @@
 "use client";
 
-import { createMessage, getNewMessages } from "@/actions/message.action";
+import { createMessage } from "@/actions/message.action";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,8 @@ import { format } from "date-fns";
 import { SendIcon } from "lucide-react";
 import { useEffect, useRef, useState, useTransition } from "react";
 import toast from "react-hot-toast";
+import { useCrypto } from "@/components/CryptoProvider";
+import { encryptForServer, decryptFromServer } from "@/lib/crypto/client";
 
 type Message = {
   id: string;
@@ -31,60 +33,134 @@ type ChatInterfaceProps = {
 
 export function ChatInterface({
   courseId,
-  initialMessages,
+  initialMessages: initialEncryptedMessages,
   currentUserId,
-}: ChatInterfaceProps) {
-  // We use a state that updates whenever initialMessages changes (server revalidation)
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+}: {
+  courseId: string;
+  initialMessages: any[];
+  currentUserId: string;
+}) {
+  const { serverPublicKeyPem, isReady } = useCrypto();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isPending, startTransition] = useTransition();
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Sync state with props when server data changes
+  // Decrypt initial messages when ready
   useEffect(() => {
-    setMessages(initialMessages);
-  }, [initialMessages]);
+    async function decryptInitial() {
+      if (!isReady || !initialEncryptedMessages.length) return;
+
+      const decrypted = await Promise.all(
+        initialEncryptedMessages.map(async (payload) => {
+          try {
+            const plaintext = await decryptFromServer(payload);
+            return {
+              id: payload.messageId,
+              content: plaintext,
+              createdAt: new Date(payload.sentAt),
+              authorId: payload.senderUserId,
+              author: {
+                name: payload.senderInfo?.name || "User",
+                username: payload.senderInfo?.username || "user",
+                image: payload.senderInfo?.image || null,
+              },
+            };
+          } catch (err) {
+            return null;
+          }
+        })
+      );
+      
+      const valid = decrypted.filter(m => m !== null) as Message[];
+      setMessages(prev => {
+        // Build a Map of all existing and new messages to ensure uniqueness by ID
+        const allMessagesMap = new Map();
+        prev.forEach(m => allMessagesMap.set(m.id, m));
+        valid.forEach(m => allMessagesMap.set(m.id, m));
+        
+        return Array.from(allMessagesMap.values()).sort((a, b) => 
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+      });
+    }
+
+    decryptInitial();
+  }, [isReady, initialEncryptedMessages]);
 
   // Scroll to bottom whenever messages change
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messages.length > 0) {
+      // Use requestAnimationFrame for more reliable scrolling in Turbopack/React 19
+      requestAnimationFrame(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      });
+    }
   }, [messages]);
 
-  // Poll for new messages
+  // Poll for new messages using the encrypted inbox
   useEffect(() => {
     const interval = setInterval(async () => {
-      if (messages.length === 0) return;
+      if (!isReady) return;
 
       const lastMessage = messages[messages.length - 1];
-      const lastMessageDate = lastMessage.createdAt;
-
-      // Handle both Date objects and strings (serialized from server)
-      const dateString =
-        lastMessageDate instanceof Date
-          ? lastMessageDate.toISOString()
-          : new Date(lastMessageDate).toISOString();
+      const since = lastMessage 
+        ? (lastMessage.createdAt instanceof Date ? lastMessage.createdAt.toISOString() : new Date(lastMessage.createdAt).toISOString())
+        : new Date(0).toISOString();
 
       try {
-        const newMsgs = await getNewMessages(courseId, dateString);
+        const res = await fetch(`/api/messages/inbox?since=${encodeURIComponent(since)}`);
+        if (!res.ok) return;
+        
+        const encryptedPayloads = await res.json();
+        if (!encryptedPayloads || !Array.isArray(encryptedPayloads) || encryptedPayloads.length === 0) return;
 
-        if (newMsgs && newMsgs.length > 0) {
+        const decryptedMessages = await Promise.all(
+          encryptedPayloads
+            .filter((p: any) => p.conversationId === courseId)
+            .map(async (payload: any) => {
+              try {
+                const plaintext = await decryptFromServer(payload);
+                return {
+                  id: payload.messageId,
+                  content: plaintext,
+                  createdAt: new Date(payload.sentAt),
+                  authorId: payload.senderUserId,
+                  author: {
+                    name: payload.senderInfo?.name || "User",
+                    username: payload.senderInfo?.username || "user",
+                    image: payload.senderInfo?.image || null,
+                  },
+                };
+              } catch (err) {
+                return null;
+              }
+            })
+        );
+
+        const validMessages = decryptedMessages.filter(m => m !== null) as Message[];
+        
+        if (validMessages.length > 0) {
           setMessages((prev) => {
-            const existingIds = new Set(prev.map((m) => m.id));
-            const uniqueNewMsgs = newMsgs.filter(
-              (m) => !existingIds.has(m.id)
-            ) as Message[];
+            const allMessagesMap = new Map();
+            prev.forEach(m => allMessagesMap.set(m.id, m));
+            validMessages.forEach(m => allMessagesMap.set(m.id, m));
+            
+            const result = Array.from(allMessagesMap.values()).sort((a, b) => 
+              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            );
 
-            if (uniqueNewMsgs.length === 0) return prev;
-            return [...prev, ...uniqueNewMsgs];
+            if (result.length === prev.length) return prev; // Avoid unnecessary re-renders
+            return result;
           });
         }
       } catch (error) {
         console.error("Polling error", error);
       }
-    }, 3000);
+    }, 4000);
 
     return () => clearInterval(interval);
-  }, [messages, courseId]);
+  }, [messages, courseId, isReady]);
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
@@ -94,9 +170,46 @@ export function ChatInterface({
 
     startTransition(async () => {
       try {
-        await createMessage(courseId, content);
+        if (isReady && serverPublicKeyPem) {
+          // Use encrypted message flow
+          const payload = await encryptForServer(
+            content,
+            currentUserId,
+            courseId,
+            serverPublicKeyPem
+          );
+
+          const res = await fetch("/api/messages/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error || "Failed to send message");
+          }
+
+          const { messageId } = await res.json();
+          // Add message to local state so sender sees it
+          const newMessage: Message = {
+            id: messageId,
+            content: content,
+            createdAt: new Date(),
+            authorId: currentUserId,
+            author: {
+              name: null, // You might want to get these from a user store/clerk
+              username: "me",
+              image: null,
+            },
+          };
+          setMessages(prev => [...prev, newMessage]);
+        } else {
+          // Fallback to plaintext flow if crypto not ready
+          await createMessage(courseId, content);
+        }
       } catch (error) {
-        toast.error("Failed to send message");
+        toast.error(error instanceof Error ? error.message : "Failed to send message");
         setInputValue(content); // Restore input on failure
       }
     });
@@ -110,8 +223,8 @@ export function ChatInterface({
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <ScrollArea className="flex-1 px-4 py-6">
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="flex-1 overflow-y-auto px-4 py-6">
         <div className="space-y-6 w-full pb-4">
           {messages.map((msg) => {
             const isMe = msg.authorId === currentUserId;
@@ -178,7 +291,7 @@ export function ChatInterface({
            {/* Invisible element to scroll to */}
            <div ref={bottomRef} />
         </div>
-      </ScrollArea>
+      </div>
 
       <div className="p-4 bg-background border-t">
         <div className="w-full flex gap-3 items-end">

@@ -1,6 +1,6 @@
 // Renders the chat interface for a specific course.
 import { getCourseById } from "@/actions/course.action";
-import { getCourseMessages } from "@/actions/message.action";
+import { getEncryptedCourseMessages } from "@/actions/message.action";
 import { getDbUserId } from "@/actions/user.action";
 import { ChatInterface } from "@/components/ChatInterface";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -20,7 +20,7 @@ export default async function ChatPage({
     return null;
   }
 
-  const messages = await getCourseMessages(courseId);
+  const initialEncryptedMessages = await getEncryptedCourseMessages(courseId);
 
   return (
     <div className="flex h-full w-full flex-col bg-background/50">
@@ -39,7 +39,7 @@ export default async function ChatPage({
 
       <ChatInterface 
         courseId={courseId} 
-        initialMessages={messages} 
+        initialMessages={initialEncryptedMessages as any} 
         currentUserId={dbUserId} 
       />
     </div>

@@ -7,7 +7,7 @@
 
 import {
   BellIcon,
-  HomeIcon,
+  CompassIcon,
   LogOutIcon,
   MenuIcon,
   MessageSquareText,
@@ -104,15 +104,15 @@ function MobileNavbar({ courses = [] }: { courses?: Course[] }) {
             <SheetTitle>Menu</SheetTitle>
           </SheetHeader>
           <nav className="flex flex-col space-y-4 mt-6">
-            {/* The home page link. */}
+            {/* The discover page link. */}
             <Button
               variant="ghost"
               className="flex items-center gap-3 justify-start"
               asChild
             >
-              <Link href="/">
-                <HomeIcon className="w-4 h-4" />
-                Home
+              <Link href="/discover">
+                <CompassIcon className="w-4 h-4" />
+                Discover
               </Link>
             </Button>
 

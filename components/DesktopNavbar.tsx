@@ -3,7 +3,12 @@
  * It includes links to the home page, notifications, and profile, as well as a sign-in button and user profile button.
  */
 
-import { BellIcon, HomeIcon, MessageSquareText, UserIcon } from "lucide-react";
+import {
+  BellIcon,
+  CompassIcon,
+  MessageSquareText,
+  UserIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -27,11 +32,11 @@ async function DesktopNavbar() {
     <div className="hidden md:flex items-center space-x-4">
       <ModeToggle />
 
-      {/* The home page link. */}
+      {/* The discover page link. */}
       <Button variant="ghost" className="flex items-center gap-2" asChild>
-        <Link href="/">
-          <HomeIcon className="w-4 h-4" />
-          <span className="hidden lg:inline">Home</span>
+        <Link href="/discover">
+          <CompassIcon className="w-4 h-4" />
+          <span className="hidden lg:inline">Discover</span>
         </Link>
       </Button>
 

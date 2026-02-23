@@ -1,3 +1,5 @@
+[Back to Index](index.md)
+
 # Infrastructure: Setup Scripts (`scripts/generate_server_key.ts`)
 
 This script is used only by the developer to initialize the server's cryptographic identity.
@@ -37,3 +39,5 @@ When running this script:
 1.  **Do not commit the output**: Never save these keys in a file that is tracked by Git.
 2.  **Use `.env.local`**: If you save them locally, ensure `.env.local` is in your `.gitignore`.
 3.  **Production Secrets**: In production (Vercel, AWS, etc.), use their specific Secret Management UI to store these values.
+
+[Back to Index](index.md)

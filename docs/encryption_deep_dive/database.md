@@ -1,3 +1,5 @@
+[Back to Index](index.md)
+
 # Data Layer: The Database Schema (`prisma/schema.prisma`)
 
 This file defines the structure of the tables that store our cryptographic data.
@@ -73,3 +75,5 @@ model MessageDelivery {
 By storing the **Public Key** in `UserKey` and the **Encrypted Payload** in `MessageDelivery`, we ensure that:
 1.  **Transparency**: Anyone can audit which public key was used for a specific delivery.
 2.  **Privacy**: Even if the `MessageDelivery` table is leaked, only the person with the corresponding **Private Key** (stored in their browser) can read it.
+
+[Back to Index](index.md)

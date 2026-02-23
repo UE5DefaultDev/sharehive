@@ -45,11 +45,20 @@ export async function createCourse(
 /**
  * Retrieves all courses from the database.
  *
+ * @param query - An optional search query to filter courses by title or content.
  * @returns A promise that resolves to an array of courses, including their authors and followers.
  */
-export async function getCourses() {
+export async function getCourses(query?: string) {
   // Use the Prisma client to find all courses.
   return prisma.course.findMany({
+    where: query
+      ? {
+          OR: [
+            { title: { contains: query, mode: "insensitive" } },
+            { content: { contains: query, mode: "insensitive" } },
+          ],
+        }
+      : {},
     // Include the related author and followedBy (followers) data for each course.
     include: {
       author: true,

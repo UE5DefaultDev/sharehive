@@ -1,14 +1,19 @@
-// Displays the main feed of courses and allows users to create new ones.
 import { getCourses } from "@/actions/course.action";
 import CourseCard from "@/components/CourseCard";
 import CreateCourse from "@/components/CreateCourse";
 import { currentUser } from "@clerk/nextjs/server";
 import { getDbUserId } from "@/actions/user.action";
 import Sidebar from "@/components/Sidebar";
+import CourseSearch from "@/components/CourseSearch";
 
-export default async function DiscoverPage() {
+export default async function DiscoverPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ query?: string }>;
+}) {
+  const { query } = await searchParams;
   const user = await currentUser();
-  const courses = await getCourses();
+  const courses = await getCourses(query);
   const dbUserId = await getDbUserId();
 
   return (
@@ -18,12 +23,23 @@ export default async function DiscoverPage() {
           <Sidebar />
         </div>
         <div className="lg:col-span-6">
+          <CourseSearch />
           {user ? <CreateCourse /> : null}
 
           <div className="space-y-6">
-            {courses.map((course) => (
-              <CourseCard key={course.id} course={course} dbUserId={dbUserId} />
-            ))}
+            {courses.length > 0 ? (
+              courses.map((course) => (
+                <CourseCard
+                  key={course.id}
+                  course={course}
+                  dbUserId={dbUserId}
+                />
+              ))
+            ) : (
+              <div className="text-center py-10 text-muted-foreground">
+                No courses found.
+              </div>
+            )}
           </div>
         </div>
 

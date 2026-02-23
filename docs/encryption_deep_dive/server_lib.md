@@ -1,3 +1,5 @@
+[Back to Index](index.md)
+
 # Backend Engine: `lib/crypto/server.ts`
 
 This file handles the backend's role in the "Hybrid" scheme using Node.js's native `crypto` module.
@@ -88,3 +90,5 @@ export async function encryptForRecipient(plaintext, meta, recipientPublicKeyPem
 
 ## 🔒 Security Note: Why Plaintext?
 As per your build plan, the server decrypts the message to store a plaintext copy in the `Message` table. This is why the server needs its own RSA keypair. This allows you to view history easily, even if your local browser keys are lost.
+
+[Back to Index](index.md)

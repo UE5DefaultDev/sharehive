@@ -1,3 +1,5 @@
+[Back to Index](index.md)
+
 # API Endpoints: Communication Layers
 
 These Next.js route handlers connect the frontend and backend crypto engines.
@@ -80,3 +82,5 @@ export async function POST(req: Request) {
   await Promise.all(deliveryPromises);
 }
 ```
+
+[Back to Index](index.md)

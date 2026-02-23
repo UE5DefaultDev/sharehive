@@ -1,3 +1,5 @@
+[Back to Index](index.md)
+
 # UI Integration: Providers & Components
 
 This explains how the E2EE integrates into the React component tree and the user experience.
@@ -75,3 +77,5 @@ useEffect(() => {
   }, 4000);
 }, [messages, isReady]);
 ```
+
+[Back to Index](index.md)

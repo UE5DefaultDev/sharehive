@@ -1,3 +1,5 @@
+[Back to Index](index.md)
+
 # Frontend Engine: `lib/crypto/client.ts`
 
 This file is the "Heart" of the E2EE. It performs all cryptographic operations inside the user's browser.
@@ -94,3 +96,5 @@ export async function decryptFromServer(payload: any) {
   return new TextDecoder().decode(decryptedBytes);
 }
 ```
+
+[Back to Index](index.md)

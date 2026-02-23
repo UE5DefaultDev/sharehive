@@ -39,7 +39,7 @@ export default function RootLayout({
             <CryptoProvider>
               <div className="h-screen flex flex-col overflow-hidden">
                 <Navbar />
-                <main className="flex-1 overflow-hidden relative flex flex-col">
+                <main className="flex-1 overflow-y-auto relative flex flex-col">
                   {children}
                 </main>
               </div>

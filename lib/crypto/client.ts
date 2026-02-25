@@ -1,10 +1,10 @@
 /**
  * CLIENT-SIDE CRYPTOGRAPHY SERVICE
- * 
- * ROLE: 
- * This file is the "Heart" of the end-to-end encryption (E2EE) on the frontend. It uses 
+ *
+ * ROLE:
+ * This file is the "Heart" of the encryption on the frontend. It uses
  * the browser's native WebCrypto API to perform all sensitive operations.
- * 
+ *
  * CORE RESPONSIBILITIES:
  * 1. RSA Key Generation: Creates the unique 2048-bit RSA-OAEP keypair for the user.
  * 2. Key Persistence: Manages the storage of the Private Key in IndexedDB (it never leaves the browser).
@@ -60,7 +60,11 @@ async function storePrivateKey(pem: string): Promise<void> {
 const PUBLIC_KEY_ID = "user_public_key";
 const FINGERPRINT_ID = "user_fingerprint";
 
-async function storeKeys(privatePem: string, publicPem: string, fingerprint: string): Promise<void> {
+async function storeKeys(
+  privatePem: string,
+  publicPem: string,
+  fingerprint: string,
+): Promise<void> {
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, "readwrite");
@@ -73,12 +77,16 @@ async function storeKeys(privatePem: string, publicPem: string, fingerprint: str
   });
 }
 
-async function getStoredKeys(): Promise<{ privateKeyPem: string; publicKeyPem: string; fingerprint: string } | null> {
+async function getStoredKeys(): Promise<{
+  privateKeyPem: string;
+  publicKeyPem: string;
+  fingerprint: string;
+} | null> {
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, "readonly");
     const store = tx.objectStore(STORE_NAME);
-    
+
     const privReq = store.get(PRIVATE_KEY_ID);
     const pubReq = store.get(PUBLIC_KEY_ID);
     const fingerReq = store.get(FINGERPRINT_ID);
@@ -133,10 +141,16 @@ function wrapPEM(base64: string, type: "PUBLIC" | "PRIVATE"): string {
 /**
  * Gets or creates a user's RSA keypair.
  */
-export async function getOrCreateUserKeypair(): Promise<{ publicKeyPem: string; fingerprint: string }> {
+export async function getOrCreateUserKeypair(): Promise<{
+  publicKeyPem: string;
+  fingerprint: string;
+}> {
   const existing = await getStoredKeys();
   if (existing) {
-    return { publicKeyPem: existing.publicKeyPem, fingerprint: existing.fingerprint };
+    return {
+      publicKeyPem: existing.publicKeyPem,
+      fingerprint: existing.fingerprint,
+    };
   }
 
   // Generate new keypair
@@ -147,13 +161,16 @@ export async function getOrCreateUserKeypair(): Promise<{ publicKeyPem: string; 
       publicExponent: new Uint8Array([1, 0, 1]),
     } as RsaHashedKeyGenParams,
     true,
-    ["encrypt", "decrypt"]
+    ["encrypt", "decrypt"],
   );
 
   const spki = await window.crypto.subtle.exportKey("spki", keyPair.publicKey);
   const publicKeyPem = wrapPEM(bufferToBase64(spki), "PUBLIC");
 
-  const pkcs8 = await window.crypto.subtle.exportKey("pkcs8", keyPair.privateKey);
+  const pkcs8 = await window.crypto.subtle.exportKey(
+    "pkcs8",
+    keyPair.privateKey,
+  );
   const privateKeyPem = wrapPEM(bufferToBase64(pkcs8), "PRIVATE");
 
   const fingerprintBuffer = await window.crypto.subtle.digest("SHA-256", spki);
@@ -173,7 +190,7 @@ export async function encryptForServer(
   plaintext: string,
   senderUserId: string,
   conversationId: string,
-  serverPublicKeyPem: string
+  serverPublicKeyPem: string,
 ): Promise<any> {
   // 1. Import server public key
   const pemHeader = "-----BEGIN PUBLIC KEY-----";
@@ -183,21 +200,20 @@ export async function encryptForServer(
     .replace(pemFooter, "")
     .replace(/\s/g, "");
   const binaryDer = base64ToBuffer(pemContents);
-  
+
   const serverPubKey = await window.crypto.subtle.importKey(
     "spki",
     binaryDer,
     RSA_ALGORITHM,
     false,
-    ["encrypt"]
+    ["encrypt"],
   );
 
   // 2. Generate AES key (256-bit) and IV (12 bytes)
-  const aesKey = await window.crypto.subtle.generateKey(
-    AES_ALGORITHM,
-    true,
-    ["encrypt", "decrypt"]
-  );
+  const aesKey = await window.crypto.subtle.generateKey(AES_ALGORITHM, true, [
+    "encrypt",
+    "decrypt",
+  ]);
   const iv = window.crypto.getRandomValues(new Uint8Array(12));
 
   // 3. Build AAD object: { conversationId, senderUserId }
@@ -214,7 +230,7 @@ export async function encryptForServer(
       additionalData: aadBytes,
     },
     aesKey,
-    plaintextBytes
+    plaintextBytes,
   );
 
   // 5. RSA-OAEP wrap AES key with server public key
@@ -222,7 +238,7 @@ export async function encryptForServer(
   const wrappedKey = await window.crypto.subtle.encrypt(
     RSA_ALGORITHM,
     serverPubKey,
-    rawAesKey
+    rawAesKey,
   );
 
   return {
@@ -245,9 +261,7 @@ export async function encryptForServer(
 /**
  * Decrypts a message from the server locally.
  */
-export async function decryptFromServer(
-  payload: any
-): Promise<string> {
+export async function decryptFromServer(payload: any): Promise<string> {
   // 1. Load keys from IndexedDB
   const keys = await getStoredKeys();
   if (!keys || !keys.privateKeyPem) throw new Error("Private key not found");
@@ -266,7 +280,7 @@ export async function decryptFromServer(
     binaryDer,
     RSA_ALGORITHM,
     false,
-    ["decrypt"]
+    ["decrypt"],
   );
 
   // 2. RSA-OAEP decrypt wrapped AES key
@@ -274,7 +288,7 @@ export async function decryptFromServer(
   const rawAesKey = await window.crypto.subtle.decrypt(
     RSA_ALGORITHM,
     privateKey,
-    wrappedKey
+    wrappedKey,
   );
 
   // 3. Import AES key
@@ -283,7 +297,7 @@ export async function decryptFromServer(
     rawAesKey,
     AES_ALGORITHM,
     false,
-    ["decrypt"]
+    ["decrypt"],
   );
 
   // 4. Rebuild AAD string with exact order
@@ -307,7 +321,7 @@ export async function decryptFromServer(
       additionalData: aadBytes,
     },
     aesKey,
-    ciphertext
+    ciphertext,
   );
 
   return new TextDecoder().decode(decryptedBytes);

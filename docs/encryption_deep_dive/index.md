@@ -9,22 +9,25 @@ This documentation suite provides a line-by-line explanation of every file in th
 ### 1. [Foundations: The Math & Concepts](./math_and_concepts.md)
 *Why we use RSA + AES, and how the underlying numbers work.*
 
-### 2. [Data Layer: The Database Schema](./database.md)
+### 2. [Visual Guide: The Encryption Flow](./visual_flow.md)
+*A Mermaid diagram showing how keys move between Client and Server.*
+
+### 3. [Data Layer: The Database Schema](./database.md)
 *A line-by-line breakdown of `prisma/schema.prisma` updates.*
 
-### 3. [Frontend Engine: `lib/crypto/client.ts`](./client_lib.md)
+### 4. [Frontend Engine: `lib/crypto/client.ts`](./client_lib.md)
 *How the browser generates keys and performs encryption/decryption.*
 
-### 4. [Backend Engine: `lib/crypto/server.ts`](./server_lib.md)
+### 5. [Backend Engine: `lib/crypto/server.ts`](./server_lib.md)
 *How the server unwraps keys and distributes deliveries.*
 
-### 5. [API Endpoints: Communication Layers](./api_endpoints.md)
+### 6. [API Endpoints: Communication Layers](./api_endpoints.md)
 *Line-by-line breakdown of all `/api/crypto/` and `/api/messages/` routes.*
 
-### 6. [UI Integration: Providers & Components](./frontend_integration.md)
+### 7. [UI Integration: Providers & Components](./frontend_integration.md)
 *How `CryptoProvider` and `ChatInterface` manage state and user experience.*
 
-### 7. [Infrastructure: Setup Scripts](./setup_scripts.md)
+### 8. [Infrastructure: Setup Scripts](./setup_scripts.md)
 *How `scripts/generate_server_key.ts` initializes the system.*
 
 ---
